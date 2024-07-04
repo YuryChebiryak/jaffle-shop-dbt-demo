@@ -1,4 +1,4 @@
-# Prerequisites
+## Prerequisites
 1. git
 2. Python 3.9 or higher
 3. Docker Desktop
