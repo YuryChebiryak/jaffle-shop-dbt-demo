@@ -10,32 +10,32 @@
 ```bash
 $ git clone https://github.com/snhou/jaffle-shop-dbt-demo.git
 ```
-1. Change into the `jaffle_shop` directory
+2. Change into the `jaffle_shop` directory
 ```bash
 $ cd jaffle-shop-dbt-demo
 ``` 
 
-1. Install virtual environment
+3. Install virtual environment
 ``` bash
 $ python3 -m venv venv
 ```
 
-1. Enter into venv
+4. Enter into venv
 ```bash
 $ source venv/bin/activate
 ```
 
-1. Update pip
+5. Update pip
 ```bash
 $ python3 -m pip install --upgrade pip
 ```
 
-1. Install dependencies
+6. Install dependencies
 ```bash
 $ python3 -m pip install -r requirements.txt
 ```
 
-1. Open Docker Desktop and run docker-compose.yaml
+7. Open Docker Desktop and run docker-compose.yaml
 ```bash
 $ docker compose build
 ```
@@ -62,34 +62,34 @@ jaffle_shop:
       threads: 4
 ```
 
-1. Ensure your profile is setup correctly from the command line:
+2. Ensure your profile is setup correctly from the command line:
 ```bash
 $ dbt debug
 ```
 * it will generate a `.user.yml` file
  
-1. Load the CSVs with the demo data set. This materializes the CSVs as tables in your target schema. Note that a typical dbt project **does not require this step** since dbt assumes your raw data is already in your warehouse.
+3. Load the CSVs with the demo data set. This materializes the CSVs as tables in your target schema. Note that a typical dbt project **does not require this step** since dbt assumes your raw data is already in your warehouse.
 ```bash
 $ dbt seed
 ```
 
-1. Run the models:
+4. Run the models:
 ```bash
 $ dbt run
 ```
 
 
-1. Test the output of the models:
+5. Test the output of the models:
 ```bash
 $ dbt test
 ```
 
-1. Generate documentation for the project:
+6. Generate documentation for the project:
 ```bash
 $ dbt docs generate
 ```
 
-1. View the documentation for the project:
+7. View the documentation for the project:
 ```bash
 $ dbt docs serve
 ```
