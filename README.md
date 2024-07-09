@@ -1,3 +1,5 @@
+[Medium Link](https://medium.com/@snhou/running-the-jaffle-shop-dbt-project-in-seconds-47bf72363744)
+
 ## Prerequisites
 1. git
 2. Python 3.9 or higher
