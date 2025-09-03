@@ -47,6 +47,11 @@ pip install uv
 uv pip install -r requirements.txt
 ```
 
+7. Install dbt packages
+```bash
+dbt deps
+```
+
 7. Install podman, initialize it and start it
 
 ```bash
@@ -143,3 +148,38 @@ If you need to manually add or modify database connections:
    - **Password**: `dbt`
 6. Click **Test Connection** to verify
 7. Click **Add** to save the database
+
+## Data-Driven Insights (DDI) Schema
+
+The project includes a dedicated `ddi` schema for advanced analytics and insights models.
+
+### Rolling 30-Day Orders Analysis
+
+The `rolling_30_day_orders` model provides time-series analysis of completed orders with the following features:
+
+- **Daily aggregations**: Total amount and order count per day
+- **Rolling metrics**: 30-day rolling sums and averages
+- **Trend analysis**: Last 50 data points for recent trend visualization
+- **ANSI SQL compliance**: Portable across PostgreSQL, Snowflake, BigQuery, Redshift, etc.
+
+#### Model Structure
+- **order_date**: Date of orders (DATE)
+- **total_amount**: Daily total payment amount (NUMERIC)
+- **order_count**: Daily number of completed orders (INTEGER)
+- **rolling_30_day_amount**: 30-day rolling sum of amounts (NUMERIC)
+- **rolling_30_day_orders**: 30-day rolling sum of order counts (NUMERIC)
+- **rolling_30_day_avg_daily**: 30-day rolling average daily amount (NUMERIC)
+
+#### Data Contracts
+The model enforces strict data quality contracts including:
+- Not null constraints on all columns
+- Value range validations
+- Uniqueness constraints on dates
+- Relationship validations
+
+#### Usage in Superset
+1. Navigate to **Data** > **Datasets**
+2. Select the `dbt` database
+3. Choose the `ddi.rolling_30_day_orders` table
+4. Create charts using the rolling metrics for trend analysis
+5. Use time-series charts to visualize order patterns over the 30-day windows
