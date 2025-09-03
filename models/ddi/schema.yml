@@ -1,0 +1,55 @@
+version: 2
+
+models:
+  - name: rolling_30_day_orders
+    description: |
+      Rolling 30-day aggregation of completed orders showing daily totals and 30-day rolling metrics.
+      This model provides insights into order trends and patterns over time.
+      Data is aggregated from completed orders only, showing the last 50 data points.
+
+    config:
+      contract:
+        enforced: true
+
+    columns:
+      - name: order_date
+        description: The date of the orders (truncated to date level)
+        data_type: date
+        tests:
+          - not_null
+
+      - name: total_amount
+        description: Total payment amount for all completed orders on this date
+        data_type: decimal
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 1000000  # Reasonable upper bound for daily totals
+
+      - name: order_count
+        description: Number of completed orders on this date
+        data_type: decimal
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 10000  # Reasonable upper bound for daily order count
+
+      - name: rolling_30_day_amount
+        description: Sum of total_amount over the current date and previous 29 days
+        data_type: decimal
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 30000000  # 30x the daily max
+
+      - name: rolling_30_day_avg_daily
+        description: Average daily total_amount over the current date and previous 29 days
+        data_type: decimal
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 1000000  # Same as daily max
