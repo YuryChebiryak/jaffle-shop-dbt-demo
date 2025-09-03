@@ -113,3 +113,33 @@ dbt docs generate
 ```bash
 dbt docs serve
 ```
+
+## Apache Superset
+
+Apache Superset is included in the docker-compose setup for data visualization and exploration.
+
+### Accessing Superset
+
+1. After running `podman compose up -d` or `docker-compose up -d`, Superset will be available at [http://localhost:8088](http://localhost:8088)
+
+2. Default login credentials:
+   - Username: `admin`
+   - Password: `admin`
+
+### Database Connection
+
+The dbt database is automatically added as a data source during Superset initialization. You can immediately start creating charts and dashboards using the dbt-transformed data in the `jaffle-shop-classic` schema.
+
+If you need to manually add or modify database connections:
+1. Log in to Superset with the admin credentials
+2. Go to **Data** > **Databases** in the top menu
+3. Click **+ Database**
+4. Select **PostgreSQL** as the database type
+5. Enter the following connection details:
+   - **Host**: `postgres`
+   - **Port**: `5432`
+   - **Database Name**: `dbt`
+   - **Username**: `dbt`
+   - **Password**: `dbt`
+6. Click **Test Connection** to verify
+7. Click **Add** to save the database
