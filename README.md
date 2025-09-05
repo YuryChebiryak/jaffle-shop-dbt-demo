@@ -8,7 +8,7 @@ Our setup is different from the original repo in that we: 1. use `uv` instead of
 ## Prerequisites
 1. git
 2. Python 3.9 or higher
-3. Docker Desktop
+3. Docker or Podman (for containerization)
 
 
 ## Setup environment
@@ -109,10 +109,11 @@ dbt run
 dbt test
 ```
 
-6. Generate documentation for the project:
+6. Generate documentation for the project and persist to database:
 ```bash
-dbt docs generate
+dbt build
 ```
+*Note: `dbt build` automatically includes `dbt docs generate` - it runs models, tests, generates docs, and persists documentation as database comments*
 
 7. View the documentation for the project:
 ```bash
@@ -133,7 +134,10 @@ Apache Superset is included in the docker-compose setup for data visualization a
 
 ### Database Connection
 
-The dbt database is automatically added as a data source during Superset initialization. You can immediately start creating charts and dashboards using the dbt-transformed data in the `jaffle-shop-classic` schema.
+The dbt database is automatically added as a data source during Superset initialization. You can immediately start creating charts and dashboards using the dbt-transformed data in the following schemas:
+
+- **Main models**: `jaffle-shop-classic` schema (staging and marts models)
+- **Analytics models**: `ddi` schema (rolling 30-day orders analysis)
 
 If you need to manually add or modify database connections:
 1. Log in to Superset with the admin credentials
@@ -180,6 +184,10 @@ The model enforces strict data quality contracts including:
 #### Usage in Superset
 1. Navigate to **Data** > **Datasets**
 2. Select the `dbt` database
-3. Choose the `ddi.rolling_30_day_orders` table
+3. Choose the `dbt_ddi.rolling_30_day_orders` table (note: `dbt_` prefix + `ddi` schema)
 4. Create charts using the rolling metrics for trend analysis
 5. Use time-series charts to visualize order patterns over the 30-day windows
+
+**Note**: Tables are organized by schema:
+- Main models (customers, orders, staging): `dbt.jaffle-shop-classic.{table_name}`
+- Analytics models (rolling metrics): `dbt.ddi.{table_name}`
