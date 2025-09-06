@@ -8,7 +8,6 @@ Our setup is different from the original repo in that we: 1. use `uv` instead of
 ## Prerequisites
 1. git
 2. Python 3.9 or higher
-3. Docker or Podman (for containerization)
 
 
 ## Setup environment
@@ -115,10 +114,12 @@ dbt build
 ```
 *Note: `dbt build` automatically includes `dbt docs generate` - it runs models, tests, generates docs, and persists documentation as database comments*
 
-7. View the documentation for the project:
+7. View documentation for the project with exposures and lineage:
 ```bash
 dbt docs serve
 ```
+*Note: The project includes exposures.yml defining dashboard dependencies for better lineage tracking*
+
 
 ## Apache Superset
 
