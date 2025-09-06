@@ -54,6 +54,7 @@ SELECT
     total_amount,
     order_count,
     rolling_30_day_amount,
+    rolling_30_day_orders,
     rolling_30_day_avg_daily
 FROM rolling_30_day
 ORDER BY order_date DESC
