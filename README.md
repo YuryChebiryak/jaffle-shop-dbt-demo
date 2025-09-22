@@ -1,4 +1,9 @@
+This repository explores how data contracts can be defined and enforced for the classic Jaffle Shop dbt demo.
+
+Medium article with the original setup of dbt with a local postgres:
 [Medium Link](https://medium.com/@snhou/running-the-jaffle-shop-dbt-project-in-seconds-47bf72363744)
+
+Our setup is different from the original repo in that we: 1. use `uv` instead of `pip` and 2. use `podman` instead of `docker`.
 
 ## Prerequisites
 1. git
@@ -10,7 +15,7 @@
 
 1. Clone this repository
 ```bash
-git clone https://github.com/snhou/jaffle-shop-dbt-demo.git
+git clone https://github.com/YuryChebiryak/jaffle-shop-dbt-demo.git
 ```
 2. Change into the `jaffle_shop` directory
 ```bash
@@ -32,17 +37,30 @@ source venv/bin/activate
 python3 -m pip install --upgrade pip
 ```
 
-6. Install dependencies
+6. Install uv
 ```bash
-python3 -m pip install -r requirements.txt
+pip install uv
 ```
 
-7. Open Docker Desktop and run docker-compose.yaml
+6. Install dependencies
 ```bash
-docker compose build
+uv pip install -r requirements.txt
+```
+
+7. Install podman, initialize it and start it
+
+```bash
+brew install podman
+podman machine init
+podman machine start
+```
+
+7. Run Podman
+```bash
+podman compose build
 ```
 ```bash
-docker compose up -d
+podman compose up -d
 ```
 
 ## Running this project
