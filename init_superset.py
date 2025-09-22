@@ -12,7 +12,7 @@ def add_dbt_database():
         cmd = [
             "superset", "set-database-uri",
             "--database-name", "dbt",
-            "--uri", "postgresql://dbt:dbt@postgres:5432/dbt"
+            "--uri", "trino://data_analyst:analyst@trino:8080/postgres_ddi"
         ]
 
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
@@ -61,7 +61,7 @@ def add_dbt_database_fallback():
             changed_by_fk
         ) VALUES (
             'dbt',
-            'postgresql://dbt:dbt@postgres:5432/dbt',
+            'trino://data_analyst:analyst@trino:8080/postgres_ddi',
             NOW(),
             NOW(),
             1,

@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   postgres:
-    image: postgres:13
+    image: postgres:15
     container_name: jaffle-postgres
     environment:
       POSTGRES_USER: dbt
@@ -22,25 +22,32 @@ services:
     image: apache/superset:latest
     container_name: jaffle-superset
     environment:
-      SUPERSET_SECRET_KEY: "your-secret-key-here-change-in-production"
+      SUPERSET_LOAD_EXAMPLES: "no"
+      SUPERSET_SECRET_KEY: "secret"
       SQLALCHEMY_DATABASE_URI: postgresql://dbt:dbt@postgres:5432/superset
     volumes:
       - superset-home:/app/superset_home
-      - ./init_superset.py:/app/init_superset.py
+      - ./init_superset.sh:/app/init_superset.sh
     ports:
       - "8088:8088"
     depends_on:
+      - trino
+    command: /app/init_superset.sh
+  trino:
+    image: trinodb/trino:latest
+    container_name: jaffle-trino
+    user: root
+    environment:
+      - DISABLE_SECURITY=false
+    ports:
+      - "8081:8080"
+    volumes:
+      - ./trino-config/catalog:/etc/trino/catalog
+      - ./trino-config:/etc/trino
+    depends_on:
       postgres:
         condition: service_healthy
-    command: >
-      bash -c "
-        pip install psycopg2-binary &&
-        superset db upgrade &&
-        superset fab create-admin --username admin --firstname Superset --lastname Admin --email admin@superset.com --password admin &&
-        superset init &&
-        python /app/init_superset.py &&
-        superset run -p 8088 --host 0.0.0.0
-      "
 volumes:
-  postgres-db-volume:
-  superset-home:
+   postgres-db-volume:
+   superset-home:
+   trino-data:

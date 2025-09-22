@@ -1,0 +1,99 @@
+{
+  "catalogs": [
+    {
+      "user": "data_analyst",
+      "catalog": "postgres_ddi",
+      "allow": "read-only"
+    }
+  ],
+  "schemas": [
+    {
+      "user": "data_analyst",
+      "catalog": "postgres_ddi",
+      "schema": "staging",
+      "owner": false
+    },
+    {
+      "user": "data_analyst",
+      "catalog": "postgres_ddi",
+      "schema": "marts",
+      "owner": false
+    },
+    {
+      "user": "data_analyst",
+      "catalog": "postgres_ddi",
+      "schema": "ddi",
+      "owner": false
+    },
+    {
+      "user": "data_analyst",
+      "catalog": "postgres_ddi",
+      "schema": "seeds",
+      "owner": false
+    }
+  ],
+  "tables": [
+    {
+      "user": "data_analyst",
+      "catalog": "postgres_ddi",
+      "schema": "staging",
+      "table": ".*",
+      "privileges": ["SELECT"]
+    },
+    {
+      "user": "data_analyst",
+      "catalog": "postgres_ddi",
+      "schema": "marts",
+      "table": ".*",
+      "privileges": ["SELECT"]
+    },
+    {
+      "user": "data_analyst",
+      "catalog": "postgres_ddi",
+      "schema": "ddi",
+      "table": ".*",
+      "privileges": ["SELECT"]
+    },
+    {
+      "user": "data_analyst",
+      "catalog": "postgres_ddi",
+      "schema": "seeds",
+      "table": ".*",
+      "privileges": ["SELECT"]
+    }
+  ],
+  "columns": [
+    {
+      "user": "data_analyst",
+      "catalog": "postgres_ddi",
+      "schema": "staging",
+      "table": ".*",
+      "column": ".*",
+      "privileges": ["SELECT"]
+    },
+    {
+      "user": "data_analyst",
+      "catalog": "postgres_ddi",
+      "schema": "marts",
+      "table": ".*",
+      "column": ".*",
+      "privileges": ["SELECT"]
+    },
+    {
+      "user": "data_analyst",
+      "catalog": "postgres_ddi",
+      "schema": "ddi",
+      "table": ".*",
+      "column": ".*",
+      "privileges": ["SELECT"]
+    },
+    {
+      "user": "data_analyst",
+      "catalog": "postgres_ddi",
+      "schema": "seeds",
+      "table": ".*",
+      "column": ".*",
+      "privileges": ["SELECT"]
+    }
+  ]
+}
