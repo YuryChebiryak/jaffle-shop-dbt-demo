@@ -21,10 +21,23 @@ require-dbt-version: [">=1.0.0", "<2.0.0"]
 
 models:
   jaffle_shop:
+      +persist_docs:
+        relation: true
+        columns: true
       schema: jaffle-shop-classic
       materialized: table
       staging:
         materialized: view
+        +docs:
+          node_color: '#C0C0C0'  # Silver
+      marts:
+        materialized: table
+        +docs:
+          node_color: '#B8860B'  # Dark Gold
       ddi:
         materialized: table
         schema: ddi
+        +docs:
+          node_color: '#B8860B'  # Dark Gold
+      +docs:
+        node_color: '#CD7F32'    # Bronze

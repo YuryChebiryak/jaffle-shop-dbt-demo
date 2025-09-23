@@ -1,6 +1,20 @@
 version: 2
 
 models:
+  - name: stg_orders
+    description: "Staging layer for raw orders, cleans and standardizes input."
+    columns:
+      - name: order_id
+        description: "Unique identifier for each order."
+        tests:
+          - unique
+          - not_null
+      - name: status
+        description: "Lifecycle state of the order."
+        tests:
+          - accepted_values:
+              values: ['placed', 'shipped', 'completed', 'return_pending', 'returned']
+
   - name: stg_customers
     columns:
       - name: customer_id
@@ -8,16 +22,6 @@ models:
           - unique
           - not_null
 
-  - name: stg_orders
-    columns:
-      - name: order_id
-        tests:
-          - unique
-          - not_null
-      - name: status
-        tests:
-          - accepted_values:
-              values: ['placed', 'shipped', 'completed', 'return_pending', 'returned']
 
   - name: stg_payments
     columns:
