@@ -98,7 +98,7 @@ def add_dataset():
         from superset.app import create_app
         from superset import db
         from superset.models.core import Database
-        from superset.datasets.models import Dataset
+        from superset.connectors.sqla.models import SqlaTable
 
         app = create_app()
         with app.app_context():
@@ -108,7 +108,7 @@ def add_dataset():
                 return False
 
             # Check if dataset exists
-            existing = db.session.query(Dataset).filter_by(
+            existing = db.session.query(SqlaTable).filter_by(
                 database_id=database.id,
                 schema='ddi',
                 table_name='rolling_30_day_orders'
@@ -118,7 +118,7 @@ def add_dataset():
                 return True
 
             # Create dataset
-            dataset = Dataset(
+            dataset = SqlaTable(
                 database_id=database.id,
                 schema='ddi',
                 table_name='rolling_30_day_orders',
