@@ -1,0 +1,9 @@
+exposures:
+  - name: rolling_sales_dashboard
+    type: dashboard
+    depends_on:
+      - ref('rolling_30_day_orders')
+    owner:
+      name: "Data Team"
+      email: "data@example.com"
+    description: "Superset dashboard showing rolling 30-day sales metrics and order trends"
