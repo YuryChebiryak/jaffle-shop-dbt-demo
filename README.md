@@ -47,6 +47,11 @@ pip install uv
 uv pip install -r requirements.txt
 ```
 
+7. Install dbt packages
+```bash
+dbt deps
+```
+
 7. Install podman, initialize it and start it
 
 ```bash
@@ -113,3 +118,68 @@ dbt docs generate
 ```bash
 dbt docs serve
 ```
+
+## Apache Superset
+
+Apache Superset is included in the docker-compose setup for data visualization and exploration.
+
+### Accessing Superset
+
+1. After running `podman compose up -d` or `docker-compose up -d`, Superset will be available at [http://localhost:8088](http://localhost:8088)
+
+2. Default login credentials:
+   - Username: `admin`
+   - Password: `admin`
+
+### Database Connection
+
+The dbt database is automatically added as a data source during Superset initialization. You can immediately start creating charts and dashboards using the dbt-transformed data in the `jaffle-shop-classic` schema.
+
+If you need to manually add or modify database connections:
+1. Log in to Superset with the admin credentials
+2. Go to **Data** > **Databases** in the top menu
+3. Click **+ Database**
+4. Select **PostgreSQL** as the database type
+5. Enter the following connection details:
+   - **Host**: `postgres`
+   - **Port**: `5432`
+   - **Database Name**: `dbt`
+   - **Username**: `dbt`
+   - **Password**: `dbt`
+6. Click **Test Connection** to verify
+7. Click **Add** to save the database
+
+## Data-Driven Insights (DDI) Schema
+
+The project includes a dedicated `ddi` schema for advanced analytics and insights models.
+
+### Rolling 30-Day Orders Analysis
+
+The `rolling_30_day_orders` model provides time-series analysis of completed orders with the following features:
+
+- **Daily aggregations**: Total amount and order count per day
+- **Rolling metrics**: 30-day rolling sums and averages
+- **Trend analysis**: Last 50 data points for recent trend visualization
+- **ANSI SQL compliance**: Portable across PostgreSQL, Snowflake, BigQuery, Redshift, etc.
+
+#### Model Structure
+- **order_date**: Date of orders (DATE)
+- **total_amount**: Daily total payment amount (NUMERIC)
+- **order_count**: Daily number of completed orders (INTEGER)
+- **rolling_30_day_amount**: 30-day rolling sum of amounts (NUMERIC)
+- **rolling_30_day_orders**: 30-day rolling sum of order counts (NUMERIC)
+- **rolling_30_day_avg_daily**: 30-day rolling average daily amount (NUMERIC)
+
+#### Data Contracts
+The model enforces strict data quality contracts including:
+- Not null constraints on all columns
+- Value range validations
+- Uniqueness constraints on dates
+- Relationship validations
+
+#### Usage in Superset
+1. Navigate to **Data** > **Datasets**
+2. Select the `dbt` database
+3. Choose the `ddi.rolling_30_day_orders` table
+4. Create charts using the rolling metrics for trend analysis
+5. Use time-series charts to visualize order patterns over the 30-day windows

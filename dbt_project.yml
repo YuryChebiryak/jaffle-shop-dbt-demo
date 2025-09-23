@@ -21,6 +21,10 @@ require-dbt-version: [">=1.0.0", "<2.0.0"]
 
 models:
   jaffle_shop:
+      schema: jaffle-shop-classic
       materialized: table
       staging:
         materialized: view
+      ddi:
+        materialized: table
+        schema: ddi
