@@ -16,7 +16,7 @@ models:
 
       - name: total_amount
         description: Total payment amount for all completed orders on this date
-        data_type: decimal
+        data_type: decimal(38,8)
         tests:
           - not_null
           - dbt_expectations.expect_column_values_to_be_between:
@@ -26,7 +26,7 @@ models:
 
       - name: order_count
         description: Number of completed orders on this date
-        data_type: decimal
+        data_type: decimal(38,8)
         tests:
           - not_null
           - dbt_expectations.expect_column_values_to_be_between:
@@ -36,7 +36,7 @@ models:
 
       - name: rolling_30_day_amount
         description: Sum of total_amount over the current date and previous 29 days
-        data_type: decimal
+        data_type: decimal(38,8)
         tests:
           - not_null
           - dbt_expectations.expect_column_values_to_be_between:
@@ -46,7 +46,7 @@ models:
 
       - name: rolling_30_day_orders
         description: Sum of order_count over the current date and previous 29 days
-        data_type: decimal
+        data_type: decimal(38,8)
         tests:
           - not_null
           - dbt_expectations.expect_column_values_to_be_between:
@@ -56,7 +56,7 @@ models:
 
       - name: rolling_30_day_avg_daily
         description: Average daily total_amount over the current date and previous 29 days
-        data_type: decimal
+        data_type: decimal(38,8)
         tests:
           - not_null
           - dbt_expectations.expect_column_values_to_be_between:
