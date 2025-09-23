@@ -8,5 +8,5 @@ jaffle_shop:
       password: dbt
       port: 5432
       dbname: dbt
-      schema: jaffle-shop-classic
+      schema: dbt
       threads: 4
