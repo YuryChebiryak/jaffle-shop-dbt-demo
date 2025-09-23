@@ -10,7 +10,6 @@ services:
       POSTGRES_DB: dbt
     volumes:
       - postgres-db-volume:/var/lib/postgresql/dbt_data
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - "5432:5432"
     healthcheck:
@@ -28,7 +27,6 @@ services:
     volumes:
       - superset-home:/app/superset_home
       - ./init_superset.sh:/app/init_superset.sh
-      - ./init_superset.py:/app/init_superset.py
     ports:
       - "8088:8088"
     depends_on:
