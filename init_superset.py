@@ -12,7 +12,7 @@ def add_dbt_database():
         cmd = [
             "superset", "set-database-uri",
             "--database-name", "dbt",
-            "--uri", "trino://data_analyst:analyst@trino:8080/postgres_ddi"
+            "--uri", "postgresql://dbt:dbt@postgres:5432/dbt"
         ]
 
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
@@ -43,12 +43,23 @@ def add_dbt_database_fallback():
         cursor = conn.cursor()
 
         # Check if database already exists
-        cursor.execute("SELECT id FROM dbs WHERE database_name = %s", ('dbt',))
-        if cursor.fetchone():
-            print("Database 'dbt' already exists in Superset")
-            cursor.close()
-            conn.close()
-            return True
+        cursor.execute("SELECT id, sqlalchemy_uri FROM dbs WHERE database_name = %s", ('dbt',))
+        existing = cursor.fetchone()
+        if existing:
+            db_id, current_uri = existing
+            expected_uri = 'postgresql://dbt:dbt@postgres:5432/dbt'
+            if current_uri == expected_uri:
+                print("Database 'dbt' already exists in Superset with correct URI")
+                cursor.close()
+                conn.close()
+                return True
+            else:
+                # Update the URI
+                cursor.execute("UPDATE dbs SET sqlalchemy_uri = %s, changed_on = NOW() WHERE id = %s", (expected_uri, db_id))
+                print("Updated database 'dbt' URI in Superset")
+                cursor.close()
+                conn.close()
+                return True
 
         # Insert the database connection
         insert_query = """
@@ -61,7 +72,7 @@ def add_dbt_database_fallback():
             changed_by_fk
         ) VALUES (
             'dbt',
-            'trino://data_analyst:analyst@trino:8080/postgres_ddi',
+            'postgresql://dbt:dbt@postgres:5432/dbt',
             NOW(),
             NOW(),
             1,
@@ -82,16 +93,59 @@ def add_dbt_database_fallback():
         print(f"Error in fallback method: {e}")
         return False
 
+def add_dataset():
+    try:
+        from superset.app import create_app
+        from superset import db
+        from superset.models.core import Database
+        from superset.datasets.models import Dataset
+
+        app = create_app()
+        with app.app_context():
+            database = db.session.query(Database).filter_by(database_name='dbt').first()
+            if not database:
+                print("Database 'dbt' not found for dataset creation")
+                return False
+
+            # Check if dataset exists
+            existing = db.session.query(Dataset).filter_by(
+                database_id=database.id,
+                schema='ddi',
+                table_name='rolling_30_day_orders'
+            ).first()
+            if existing:
+                print("Dataset for ddi.rolling_30_day_orders already exists")
+                return True
+
+            # Create dataset
+            dataset = Dataset(
+                database_id=database.id,
+                schema='ddi',
+                table_name='rolling_30_day_orders',
+                owners=[],
+                created_by_fk=1,
+                changed_by_fk=1
+            )
+            db.session.add(dataset)
+            db.session.commit()
+            print("Successfully added dataset for ddi.rolling_30_day_orders")
+            return True
+    except Exception as e:
+        print(f"Error adding dataset: {e}")
+        return False
+
 if __name__ == "__main__":
     print("Attempting to add dbt database to Superset...")
 
     # Try CLI method first
     if add_dbt_database():
+        add_dataset()
         sys.exit(0)
 
     # Fallback to direct SQL
     print("CLI method failed, trying fallback...")
     if add_dbt_database_fallback():
+        add_dataset()
         sys.exit(0)
 
     print("All methods failed to add database")

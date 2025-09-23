@@ -28,26 +28,13 @@ services:
     volumes:
       - superset-home:/app/superset_home
       - ./init_superset.sh:/app/init_superset.sh
+      - ./init_superset.py:/app/init_superset.py
     ports:
       - "8088:8088"
     depends_on:
-      - trino
-    command: /app/init_superset.sh
-  trino:
-    image: trinodb/trino:latest
-    container_name: jaffle-trino
-    user: root
-    environment:
-      - DISABLE_SECURITY=false
-    ports:
-      - "8081:8080"
-    volumes:
-      - ./trino-config/catalog:/etc/trino/catalog
-      - ./trino-config:/etc/trino
-    depends_on:
       postgres:
         condition: service_healthy
+    command: /app/init_superset.sh
 volumes:
-   postgres-db-volume:
-   superset-home:
-   trino-data:
+    postgres-db-volume:
+    superset-home:
