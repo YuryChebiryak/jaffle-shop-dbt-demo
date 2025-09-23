@@ -19,6 +19,9 @@ clean-targets:
 
 require-dbt-version: [">=1.0.0", "<2.0.0"]
 
+data_tests:
+  +store_failures: true
+
 models:
   jaffle_shop:
       +persist_docs:
