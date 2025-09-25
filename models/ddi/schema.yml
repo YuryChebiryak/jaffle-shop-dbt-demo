@@ -2,7 +2,7 @@ version: 2
 
 models:
   - name: rolling_30_day_orders
-    description: Aggregated completed orders over 30 days
+    description: Aggregated completed orders over 30 days, sourced from stg_orders and stg_payments tables
     config:
       contract:
         enforced: true
