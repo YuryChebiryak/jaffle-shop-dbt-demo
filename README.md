@@ -5,6 +5,8 @@ Medium article with the original setup of dbt with a local postgres:
 
 Our setup is different from the original repo in that we: 1. use `uv` instead of `pip` and 2. use `podman` instead of `docker`.
 
+![Jaffle Shop Architecture](etc/architecture_diagram.png)
+
 ## Prerequisites
 1. git
 2. Python 3.9 or higher
@@ -192,3 +194,40 @@ The model enforces strict data quality contracts including:
 **Note**: Tables are organized by schema:
 - Main models (customers, orders, staging): `dbt.jaffle-shop-classic.{table_name}`
 - Analytics models (rolling metrics): `dbt.ddi.{table_name}`
+
+## Trino Cluster
+
+The setup includes a Trino cluster that registers the Postgres database in the catalog named `jaffle_postgres`. Trino provides a federated query engine allowing SQL queries across multiple data sources.
+
+### Accessing Trino
+
+After running `podman compose up -d` or `docker-compose up -d`, Trino will be available at [http://localhost:8080](http://localhost:8080)
+
+### Connecting with DBeaver
+
+#### Connecting to Trino
+
+1. In DBeaver, create a new connection
+2. Select **Trino** as the database type
+3. Enter the following connection details:
+   - **Host**: `localhost`
+   - **Port**: `8080`
+   - **Database/Schema**: `jaffle_postgres`
+4. No username or password is required (default configuration)
+5. Click **Test Connection** to verify
+6. Click **Finish** to save the connection
+
+#### Connecting to Postgres Directly
+
+1. In DBeaver, create a new connection
+2. Select **PostgreSQL** as the database type
+3. Enter the following connection details:
+   - **Host**: `localhost`
+   - **Port**: `5432`
+   - **Database**: `dbt`
+   - **Username**: `dbt`
+   - **Password**: `dbt`
+4. Click **Test Connection** to verify
+5. Click **Finish** to save the connection
+
+Note: The Trino user (`trino_user`) has limited access to `dbt_ddi` and `dbt_marts` schemas only, while the direct Postgres connection uses the `dbt` user with full access.
