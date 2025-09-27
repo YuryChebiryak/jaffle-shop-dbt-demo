@@ -3,7 +3,35 @@ This repository explores how data contracts can be defined and enforced for the 
 Medium article with the original setup of dbt with a local postgres:
 [Medium Link](https://medium.com/@snhou/running-the-jaffle-shop-dbt-project-in-seconds-47bf72363744)
 
-Our setup is different from the original repo in that we: 1. use `uv` instead of `pip` and 2. use `podman` instead of `docker`.
+Our setup is different from the original repo in that
+- we use `uv` instead of `pip` [see why](https://medium.com/@sumakbn/uv-vs-pip-revolutionizing-python-package-management-576915e90f7e),
+- `podman` instead of `Docker` [see why](https://medium.com/@sumakbn/uv-vs-pip-revolutionizing-python-package-management-576915e90f7e),
+- Kilo Code VS Code extension with Grok,
+- Apache Superset to browse Postgres data
+
+This is a post in the series titled "Data Contracts with dbt"
+
+[1/7: Why Data Contracts Matter](https://www.linkedin.com/feed/update/urn:li:activity:7367654714525642753/)
+
+[2/7 Declaring Data Contracts in dbt](https://www.linkedin.com/feed/update/urn:li:activity:7369170884021964801/)
+
+[3/7 Enforcing with Data Tests](https://www.linkedin.com/feed/update/urn:li:activity:7369463558130098178/)
+
+[4/7 Documentation Matters](https://www.linkedin.com/feed/update/urn:li:activity:7370036803829063680/?updateEntityUrn=urn%3Ali%3Afs_feedUpdate%3A%28V2%2Curn%3Ali%3Aactivity%3A7370036803829063680%29)
+
+[5/7 Tracking Data Consumers with dbt Exposures](https://www.linkedin.com/feed/update/urn:li:activity:7370761583909568512/?updateEntityUrn=urn%3Ali%3Afs_feedUpdate%3A%28V2%2Curn%3Ali%3Aactivity%3A7370761583909568512%29)
+
+[6/7 Data Contracts, ELT, and the role of DBT](https://www.linkedin.com/feed/update/urn:li:activity:7371108866610126848/?updateEntityUrn=urn%3Ali%3Afs_feedUpdate%3A%28V2%2Curn%3Ali%3Aactivity%3A7371108866610126848%29)
+
+[7/7 Digging into Failures with store_failures](https://www.linkedin.com/feed/update/urn:li:activity:7371856485129011201/?updateEntityUrn=urn%3Ali%3Afs_feedUpdate%3A%28V2%2Curn%3Ali%3Aactivity%3A7371856485129011201%29)
+
+[8/7 Testing Data Contracts with datacontract.com CLI](https://www.linkedin.com/feed/update/urn:li:activity:7375296445676945408/?updateEntityUrn=urn%3Ali%3Afs_feedUpdate%3A%28V2%2Curn%3Ali%3Aactivity%3A7375296445676945408%29)
+
+[9/7 𝐅𝐞𝐝𝐞𝐫𝐚𝐭𝐞𝐝 𝐀𝐜𝐜𝐞𝐬𝐬 𝐰𝐢𝐭𝐡 𝐓𝐫𝐢𝐧𝐨](https://www.linkedin.com/posts/yurychebiryak_datamesh-dbt-vibecoding-activity-7377590326426775552-ELRJ?utm_source=share&utm_medium=member_ios&rcm=ACoAAAEI_0oB7fYEPncLP2s2k_qPhBZeQS5RO7s)
+
+[𝟏𝟎/𝟕 Testing Data Expectations in dbt](TBD)
+
+(C) 2025 Chebiryak Consulting https://consulting.chebiryak.name/about-me/
 
 ![Jaffle Shop Architecture](etc/architecture_diagram.png)
 
@@ -104,6 +132,11 @@ dbt seed
 dbt run
 ```
 
+*Note: The project uses tags to organize models by schema, allowing selective execution. For example, to run only models tagged with 'ddi' with debug logging:*
+
+```bash
+dbt run -s tag:ddi --log-level debug
+```
 
 5. Test the output of the models:
 ```bash

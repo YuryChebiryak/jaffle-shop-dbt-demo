@@ -6,6 +6,7 @@ models:
     config:
       contract:
         enforced: true
+      tags: [serving, ddi]
 
     columns:
       - name: order_date

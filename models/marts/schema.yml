@@ -3,6 +3,8 @@ version: 2
 models:
   - name: customers
     description: This table has basic information about a customer, as well as some derived facts based on a customer's orders
+    config:
+      tags: [serving]
 
     columns:
       - name: customer_id
@@ -31,6 +33,8 @@ models:
 
   - name: orders
     description: This table has basic information about orders, as well as some derived facts based on payments
+    config:
+      tags: [serving]
 
     columns:
       - name: order_id
