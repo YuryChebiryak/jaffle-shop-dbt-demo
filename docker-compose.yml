@@ -33,6 +33,17 @@ services:
       postgres:
         condition: service_healthy
     command: /app/init_superset.sh
+  trino:
+    image: trinodb/trino:latest
+    container_name: trino
+    ports:
+      - "8080:8080"
+    environment:
+      - DISCOVERY_URI=http://trino:8080
+    volumes:
+      - ./trino/etc:/etc/trino
+    depends_on:
+      - postgres
 volumes:
     postgres-db-volume:
     superset-home:
