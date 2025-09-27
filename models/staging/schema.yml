@@ -9,6 +9,15 @@ models:
         tests:
           - unique
           - not_null
+      - name: customer_id
+        description: "Foreign key to the customers table."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_customers')
+              field: customer_id
+      - name: order_date
+        description: "Date when the order was placed."
       - name: status
         description: "Lifecycle state of the order."
         tests:
@@ -17,21 +26,39 @@ models:
                 values: ['placed', 'shipped', 'completed', 'return_pending', 'returned']
 
   - name: stg_customers
+    description: "Staging layer for raw customers, cleans and standardizes input."
     columns:
       - name: customer_id
+        description: "Unique identifier for each customer."
         tests:
           - unique
           - not_null
+      - name: first_name
+        description: "Customer's first name."
+      - name: last_name
+        description: "Customer's last name."
 
 
   - name: stg_payments
+    description: "Staging layer for raw payments, cleans and standardizes input."
     columns:
       - name: payment_id
+        description: "Unique identifier for each payment."
         tests:
           - unique
           - not_null
+      - name: order_id
+        description: "Foreign key to the orders table."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_orders')
+              field: order_id
       - name: payment_method
+        description: "Method used for payment."
         tests:
           - accepted_values:
               arguments:
                 values: ['credit_card', 'coupon', 'bank_transfer', 'gift_card']
+      - name: amount
+        description: "Payment amount in dollars."
