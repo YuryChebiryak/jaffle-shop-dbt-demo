@@ -39,7 +39,7 @@ at_risk_customers as (
         cos.last_order_date,
         cos.total_orders,
         cos.completed_orders,
-        cd.current_date,
+        cd.current_date as reference_date,
         (cd.current_date - cos.last_order_date) as days_since_last_order
     from customers c
     inner join customer_order_summary cos

@@ -63,3 +63,79 @@ models:
               arguments:
                 min_value: 0
                 max_value: 1000000  # Same as daily max
+
+  - name: at_risk_customers
+    description: Customers who haven't ordered in 60+ days but have prior activity, at risk of churning
+    config:
+      contract:
+        enforced: true
+
+    columns:
+      - name: customer_id
+        description: Unique identifier for the customer
+        data_type: integer
+        tests:
+          - unique
+          - not_null
+
+      - name: first_name
+        description: Customer's first name
+        data_type: varchar
+        tests:
+          - not_null
+
+      - name: last_name
+        description: Customer's last name
+        data_type: varchar
+        tests:
+          - not_null
+
+      - name: first_order_date
+        description: Date of customer's first order
+        data_type: date
+        tests:
+          - not_null
+
+      - name: last_order_date
+        description: Date of customer's most recent order
+        data_type: date
+        tests:
+          - not_null
+
+      - name: total_orders
+        description: Total number of orders placed by customer
+        data_type: bigint
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              arguments:
+                min_value: 1
+                max_value: 1000  # Reasonable upper bound
+
+      - name: completed_orders
+        description: Number of completed orders by customer
+        data_type: bigint
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              arguments:
+                min_value: 0
+                max_value: 1000
+
+      - name: reference_date
+        description: Reference date used for calculation (max order date in dataset)
+        data_type: date
+        tests:
+          - not_null
+        constraints:
+          - type: not_null
+
+      - name: days_since_last_order
+        description: Number of days since customer's last order
+        data_type: integer
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              arguments:
+                min_value: 60
+                max_value: 1000  # Reasonable upper bound for days
