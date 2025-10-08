@@ -29,7 +29,11 @@ This is a post in the series titled "Data Contracts with dbt"
 
 [9/7 𝐅𝐞𝐝𝐞𝐫𝐚𝐭𝐞𝐝 𝐀𝐜𝐜𝐞𝐬𝐬 𝐰𝐢𝐭𝐡 𝐓𝐫𝐢𝐧𝐨](https://www.linkedin.com/posts/yurychebiryak_datamesh-dbt-vibecoding-activity-7377590326426775552-ELRJ?utm_source=share&utm_medium=member_ios&rcm=ACoAAAEI_0oB7fYEPncLP2s2k_qPhBZeQS5RO7s)
 
-[𝟏𝟎/𝟕 Testing Data Expectations in dbt](TBD)
+[𝟏𝟎/𝟕 Testing Data Expectations in dbt](https://www.linkedin.com/feed/update/urn:li:activity:7380127053439819776/)
+
+11/7 Atomicity and Idempotence in Data Pipelines
+
+12/7 Why MCP matters
 
 (C) 2025 Chebiryak Consulting https://consulting.chebiryak.name/about-me/
 
