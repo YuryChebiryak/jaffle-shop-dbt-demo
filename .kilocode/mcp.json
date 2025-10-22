@@ -1,0 +1,47 @@
+{
+  "mcpServers": {
+    "dbt-mcp": {
+      "command": "uvx",
+      "args": [
+        "--env-file",
+        "/Users/yury/dbt-mcp/.env",
+        "dbt-mcp"
+      ],
+      "cwd": "/Users/yury/jaffle-shop-dbt-demo",
+      "disabled": false,
+      "autoApprove": [],
+      "alwaysAllow": [
+        "list_metrics",
+        "get_dimensions",
+        "get_entities",
+        "query_metrics",
+        "get_mart_models",
+        "get_all_models",
+        "get_model_details",
+        "get_model_parents",
+        "get_model_children",
+        "get_model_health",
+        "get_exposures",
+        "get_job_run_artifact",
+        "list_job_run_artifacts",
+        "retry_job_run",
+        "cancel_job_run",
+        "get_metrics_compiled_sql",
+        "get_exposure_details",
+        "build",
+        "compile",
+        "docs",
+        "parse",
+        "run",
+        "test",
+        "show",
+        "list_jobs",
+        "list",
+        "get_job_details",
+        "trigger_job_run",
+        "get_job_run_details",
+        "list_jobs_runs"
+      ]
+    }
+  }
+}
