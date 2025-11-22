@@ -24,6 +24,8 @@ data_tests:
 
 models:
   jaffle_shop:
+      +post-hook:
+        - "{{ validate_data_contract() }}"
       +persist_docs:
         relation: true
         columns: true

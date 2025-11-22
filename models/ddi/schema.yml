@@ -10,9 +10,10 @@ models:
 
     tests:
       - dbt_expectations.expect_column_pair_values_A_to_be_greater_than_B:
-          column_A: rolling_30_day_amount
-          column_B: total_amount
-          or_equal: True
+          arguments:
+            column_A: rolling_30_day_amount
+            column_B: total_amount
+            or_equal: True
 
     columns:
       - name: order_date
