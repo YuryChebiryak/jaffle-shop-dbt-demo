@@ -5,39 +5,51 @@ models:
     description: This table has basic information about a customer, as well as some derived facts based on a customer's orders
     config:
       tags: [serving]
+      contract:
+        enforced: true
 
     columns:
       - name: customer_id
         description: This is a unique identifier for a customer
+        data_type: integer
         tests:
           - unique
           - not_null
 
       - name: first_name
         description: Customer's first name. PII.
+        data_type: varchar
 
       - name: last_name
         description: Customer's last name. PII.
+        data_type: varchar
 
       - name: first_order
         description: Date (UTC) of a customer's first order
+        data_type: date
 
       - name: most_recent_order
         description: Date (UTC) of a customer's most recent order
+        data_type: date
 
       - name: number_of_orders
         description: Count of the number of orders a customer has placed
+        data_type: bigint
 
-      - name: total_order_amount
+      - name: customer_lifetime_value
         description: Total value (AUD) of a customer's orders
+        data_type: bigint
 
   - name: orders
     description: This table has basic information about orders, as well as some derived facts based on payments
     config:
       tags: [serving]
+      contract:
+        enforced: true
 
     columns:
       - name: order_id
+        data_type: integer
         tests:
           - unique
           - not_null
@@ -45,6 +57,7 @@ models:
 
       - name: customer_id
         description: Foreign key to the customers table
+        data_type: integer
         tests:
           - not_null
           - relationships:
@@ -54,9 +67,11 @@ models:
 
       - name: order_date
         description: Date (UTC) that the order was placed
+        data_type: date
 
       - name: status
         description: '{{ doc("orders_status") }}'
+        data_type: varchar
         tests:
           - accepted_values:
               arguments:
@@ -64,25 +79,30 @@ models:
 
       - name: amount
         description: Total amount (AUD) of the order
+        data_type: bigint
         tests:
           - not_null
 
       - name: credit_card_amount
         description: Amount of the order (AUD) paid for by credit card
+        data_type: bigint
         tests:
           - not_null
 
       - name: coupon_amount
         description: Amount of the order (AUD) paid for by coupon
+        data_type: bigint
         tests:
           - not_null
 
       - name: bank_transfer_amount
         description: Amount of the order (AUD) paid for by bank transfer
+        data_type: bigint
         tests:
           - not_null
 
       - name: gift_card_amount
         description: Amount of the order (AUD) paid for by gift card
+        data_type: bigint
         tests:
           - not_null
