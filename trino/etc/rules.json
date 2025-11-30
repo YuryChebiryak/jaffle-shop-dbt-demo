@@ -1,0 +1,72 @@
+{
+  "catalogs": [
+    {
+      "user": "admin",
+      "catalog": ".*",
+      "allow": "all"
+    },
+    {
+      "user": "trino_user",
+      "catalog": "jaffle_postgres",
+      "allow": "all"
+    },
+    {
+      "user": "data_analyst",
+      "catalog": "jaffle_postgres",
+      "allow": "read-only"
+    },
+    {
+      "user": "data_scientist",
+      "catalog": "jaffle_postgres",
+      "allow": "read-only"
+    },
+    {
+      "catalog": "system",
+      "allow": "none"
+    }
+  ],
+  "schemas": [
+    {
+      "user": "admin",
+      "schema": ".*",
+      "owner": true
+    },
+    {
+      "user": "trino_user",
+      "schema": ".*",
+      "owner": true
+    },
+    {
+      "user": "data_analyst",
+      "schema": "dbt_ddi",
+      "owner": false
+    },
+    {
+      "user": "data_scientist",
+      "schema": "dbt_ddi",
+      "owner": false
+    }
+  ],
+  "tables": [
+    {
+      "user": "admin",
+      "privileges": ["SELECT", "INSERT", "DELETE", "OWNERSHIP", "GRANT_SELECT"]
+    },
+    {
+      "user": "trino_user",
+      "privileges": ["SELECT", "INSERT", "DELETE", "OWNERSHIP", "GRANT_SELECT"]
+    },
+    {
+      "user": "data_analyst",
+      "schema": "dbt_ddi",
+      "table": "rolling_30_day_orders",
+      "privileges": ["SELECT"]
+    },
+    {
+      "user": "data_scientist",
+      "schema": "dbt_ddi",
+      "table": "at_risk_customers",
+      "privileges": ["SELECT"]
+    }
+  ]
+}

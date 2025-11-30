@@ -6,6 +6,8 @@ models:
     config:
       contract:
         enforced: true
+      grants:
+        select: ['data_analyst']
       tags: [serving, ddi]
 
     tests:
@@ -77,6 +79,8 @@ models:
     config:
       contract:
         enforced: true
+      grants:
+        select: ['data_scientist']
 
     columns:
       - name: customer_id
