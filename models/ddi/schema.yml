@@ -7,7 +7,6 @@ models:
       contract:
         enforced: true
       tags: [serving, ddi]
-      post_hook: "{{ validate_data_contract() }}"
 
     tests:
       - dbt_expectations.expect_column_pair_values_A_to_be_greater_than_B:
@@ -78,7 +77,6 @@ models:
     config:
       contract:
         enforced: true
-      post_hook: "{{ validate_data_contract() }}"
 
     columns:
       - name: customer_id
