@@ -1,9 +1,7 @@
 {% macro validate_data_contract() %}
-    {# Only run validation if the contract is enforced #}
-    {% if model.config.contract.enforced %}
-        {% set relation = this %}
-        
-        {# Fetch runtime columns from the database #}
+    {% set relation = this %}
+    
+    {# Fetch runtime columns from the database #}
         {% set runtime_columns = adapter.get_columns_in_relation(relation) %}
         {% set runtime_col_dict = {} %}
         {% for col in runtime_columns %}
@@ -77,5 +75,4 @@
         {% else %}
             {{ log("Data Contract Validation Passed for " ~ relation.name, info=True) }}
         {% endif %}
-    {% endif %}
 {% endmacro %}
