@@ -159,6 +159,53 @@ dbt docs serve
 ```
 *Note: The project includes exposures.yml defining dashboard dependencies for better lineage tracking*
 
+## Data Quality and Contract Validation
+
+This project implements two layers of data quality enforcement:
+1. **dbt Contract Validation**: Validates that the physical database schema matches the defined dbt contract (columns and data types).
+2. **Soda Checks**: Validates data quality rules (nulls, uniqueness, ranges) using SodaCL, generated automatically from dbt tests.
+
+### dbt Contract Validation
+
+The project includes a custom macro `validate_contracts` that enforces schema contracts for models tagged with `serving`.
+
+To run the validation:
+```bash
+dbt run-operation validate_contracts
+```
+
+This macro checks:
+- **Missing columns**: Columns defined in the contract but missing in the database.
+- **Extra columns**: Columns present in the database but not in the contract.
+- **Type mismatches**: Discrepancies between defined data types and actual database types.
+
+If any violations are found, the operation raises a compiler error and fails the pipeline.
+
+**Best Practice**: Run this operation as a **pre-commit hook** or as a blocking step in your **CI/CD pipeline** (e.g., GitHub Actions, GitLab CI) to ensure that no code violating the data contract is merged or deployed.
+
+### Soda Checks Generation
+
+We use Soda Core to run data quality checks. To ensure consistency between dbt tests and Soda checks, we provide a script to generate SodaCL configuration from dbt model definitions.
+
+To generate Soda checks:
+```bash
+python3 generate_soda_from_dbt_contract.py
+```
+
+This script:
+1. Reads the dbt schema definition (e.g., `models/ddi/schema.yml`)
+2. Translates dbt tests into SodaCL checks:
+   - `not_null` -> `missing_count = 0`
+   - `unique` -> `duplicate_count = 0`
+   - `accepted_values` -> `invalid_percent = 0`
+   - `dbt_expectations` -> `min/max` checks
+3. Outputs YAML files (e.g., `soda_checks_rolling_30_day_orders.yml`)
+
+To run the generated Soda checks (requires Soda Core installed and configured):
+```bash
+soda scan -d jaffle_shop_datasource -c .soda/configuration.yml soda_checks_rolling_30_day_orders.yml
+```
+
 
 ## Apache Superset
 

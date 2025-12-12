@@ -1,0 +1,35 @@
+checks for dbt_ddi.at_risk_customers:
+- row_count > 0:
+    name: Has some rows
+- duplicate_count(customer_id) = 0:
+    name: No duplicates in customer_id
+- missing_count(customer_id) = 0:
+    name: No missing values in customer_id
+- missing_count(first_name) = 0:
+    name: No missing values in first_name
+- missing_count(last_name) = 0:
+    name: No missing values in last_name
+- missing_count(first_order_date) = 0:
+    name: No missing values in first_order_date
+- missing_count(last_order_date) = 0:
+    name: No missing values in last_order_date
+- missing_count(total_orders) = 0:
+    name: No missing values in total_orders
+- min(total_orders) >= 1:
+    name: total_orders min 1
+- max(total_orders) <= 1000:
+    name: total_orders max 1000
+- missing_count(completed_orders) = 0:
+    name: No missing values in completed_orders
+- min(completed_orders) >= 0:
+    name: completed_orders min 0
+- max(completed_orders) <= 1000:
+    name: completed_orders max 1000
+- missing_count(reference_date) = 0:
+    name: No missing values in reference_date
+- missing_count(days_since_last_order) = 0:
+    name: No missing values in days_since_last_order
+- min(days_since_last_order) >= 60:
+    name: days_since_last_order min 60
+- max(days_since_last_order) <= 1000:
+    name: days_since_last_order max 1000

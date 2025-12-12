@@ -1,0 +1,35 @@
+checks for dbt_ddi.rolling_30_day_orders:
+- row_count > 0:
+    name: Has some rows
+- missing_count(order_date) = 0:
+    name: No missing values in order_date
+- missing_count(total_amount) = 0:
+    name: No missing values in total_amount
+- min(total_amount) >= 0:
+    name: total_amount min 0
+- max(total_amount) <= 1000000:
+    name: total_amount max 1000000
+- missing_count(order_count) = 0:
+    name: No missing values in order_count
+- min(order_count) >= 0:
+    name: order_count min 0
+- max(order_count) <= 10000:
+    name: order_count max 10000
+- missing_count(rolling_30_day_amount) = 0:
+    name: No missing values in rolling_30_day_amount
+- min(rolling_30_day_amount) >= 0:
+    name: rolling_30_day_amount min 0
+- max(rolling_30_day_amount) <= 30000000:
+    name: rolling_30_day_amount max 30000000
+- missing_count(rolling_30_day_orders) = 0:
+    name: No missing values in rolling_30_day_orders
+- min(rolling_30_day_orders) >= 0:
+    name: rolling_30_day_orders min 0
+- max(rolling_30_day_orders) <= 300000:
+    name: rolling_30_day_orders max 300000
+- missing_count(rolling_30_day_avg_daily) = 0:
+    name: No missing values in rolling_30_day_avg_daily
+- min(rolling_30_day_avg_daily) >= 0:
+    name: rolling_30_day_avg_daily min 0
+- max(rolling_30_day_avg_daily) <= 1000000:
+    name: rolling_30_day_avg_daily max 1000000
