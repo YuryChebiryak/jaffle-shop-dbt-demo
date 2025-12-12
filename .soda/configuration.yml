@@ -1,0 +1,8 @@
+data_source jaffle_shop_datasource:
+  type: postgres
+  connection:
+    host: localhost
+    port: 5432
+    username: dbt
+    password: dbt
+    database: dbt

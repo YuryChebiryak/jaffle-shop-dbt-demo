@@ -1,0 +1,27 @@
+checks for dbt_marts.orders:
+  - row_count > 0:
+      name: Has some rows
+  - duplicate_count(order_id) = 0:
+      name: No duplicates in order_id
+  - missing_count(order_id) = 0:
+      name: No missing values in order_id
+  - missing_count(customer_id) = 0:
+      name: No missing values in customer_id
+  - invalid_percent(status) = 0:
+      name: Status values are accepted
+      valid values:
+        - placed
+        - shipped
+        - completed
+        - return_pending
+        - returned
+  - missing_count(amount) = 0:
+      name: No missing values in amount
+  - missing_count(credit_card_amount) = 0:
+      name: No missing values in credit_card_amount
+  - missing_count(coupon_amount) = 0:
+      name: No missing values in coupon_amount
+  - missing_count(bank_transfer_amount) = 0:
+      name: No missing values in bank_transfer_amount
+  - missing_count(gift_card_amount) = 0:
+      name: No missing values in gift_card_amount
