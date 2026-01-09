@@ -27,12 +27,16 @@ models:
       +persist_docs:
         relation: true
         columns: true
+      # Iceberg configuration for all models
+      +table_format: iceberg
+      +iceberg_location: s3://jaffle-iceberg-warehouse/jaffle_shop
       seeds:
         +schema: seeds
-      +materialized: table
+        +materialized: table
+      # Staging layer - changed from view to table for Iceberg support
       staging:
         +schema: staging
-        +materialized: view
+        +materialized: table
         +docs:
           node_color: '#C0C0C0'  # Silver
       marts:

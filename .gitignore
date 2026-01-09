@@ -2,6 +2,10 @@ target/
 logs/
 **/.DS_Store
 venv/
+.venv/
 .user.yml
 dbt_internal_packages/
 dbt_packages/
+data/
+*.db
+*.db.wal

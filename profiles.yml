@@ -2,11 +2,17 @@ jaffle_shop:
   target: dev
   outputs:
     dev:
-      type: postgres
-      host: localhost
-      user: dbt
-      password: dbt
-      port: 5432
-      dbname: dbt
-      schema: dbt
+      type: duckdb
+      path: ./data/duckdb/jaffle_shop.db
+      extensions:
+        - iceberg
+        - httpfs
       threads: 4
+      settings:
+        # S3-compatible storage for Iceberg (using MinIO)
+        s3_region: us-east-1
+        s3_endpoint: localhost:9000
+        s3_access_key_id: minioadmin
+        s3_secret_access_key: minioadmin
+        s3_use_ssl: false
+        s3_url_style: path
