@@ -58,4 +58,4 @@ SELECT
     rolling_30_day_avg_daily
 FROM rolling_30_day
 ORDER BY order_date DESC
-FETCH FIRST 50 ROWS ONLY
+LIMIT 50

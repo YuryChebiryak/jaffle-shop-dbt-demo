@@ -38,7 +38,7 @@ models:
 
       - name: customer_lifetime_value
         description: Total value (AUD) of a customer's orders
-        data_type: bigint
+        data_type: double
 
   - name: orders
     description: This table has basic information about orders, as well as some derived facts based on payments
@@ -79,30 +79,30 @@ models:
 
       - name: amount
         description: Total amount (AUD) of the order
-        data_type: bigint
+        data_type: double
         tests:
           - not_null
 
       - name: credit_card_amount
         description: Amount of the order (AUD) paid for by credit card
-        data_type: bigint
+        data_type: double
         tests:
           - not_null
 
       - name: coupon_amount
         description: Amount of the order (AUD) paid for by coupon
-        data_type: bigint
+        data_type: double
         tests:
           - not_null
 
       - name: bank_transfer_amount
         description: Amount of the order (AUD) paid for by bank transfer
-        data_type: bigint
+        data_type: double
         tests:
           - not_null
 
       - name: gift_card_amount
         description: Amount of the order (AUD) paid for by gift card
-        data_type: bigint
+        data_type: double
         tests:
           - not_null

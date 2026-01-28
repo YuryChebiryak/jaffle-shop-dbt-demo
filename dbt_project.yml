@@ -27,8 +27,6 @@ models:
       +persist_docs:
         relation: true
         columns: true
-      seeds:
-        +schema: seeds
       +materialized: table
       staging:
         +schema: staging
