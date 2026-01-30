@@ -27,6 +27,11 @@ services:
       - CATALOG__S3__PATH_STYLE_ACCESS=true
     depends_on:
       - minio
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8181/v1/config"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
   superset:
     image: apache/superset:latest
     container_name: jaffle-superset
@@ -50,7 +55,8 @@ services:
     volumes:
       - ./trino/etc:/etc/trino
     depends_on:
-      - iceberg-rest
+      iceberg-rest:
+        condition: service_healthy
 volumes:
     minio-data:
     superset-home:

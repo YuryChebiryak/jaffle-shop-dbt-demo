@@ -1,4 +1,4 @@
-This repository explores how data contracts can be defined and enforced for the classic Jaffle Shop dbt demo.
+This repository explores how data contracts can be defined and enforced for the classic Jaffle Shop dbt demo using DuckDB with Apache Iceberg.
 
 Medium article with the original setup of dbt with a local postgres:
 [Medium Link](https://medium.com/@snhou/running-the-jaffle-shop-dbt-project-in-seconds-47bf72363744)
@@ -7,7 +7,8 @@ Our setup is different from the original repo in that
 - we use `uv` instead of `pip` [see why](https://medium.com/@sumakbn/uv-vs-pip-revolutionizing-python-package-management-576915e90f7e),
 - `podman` instead of `Docker` [see why](https://medium.com/@sumakbn/uv-vs-pip-revolutionizing-python-package-management-576915e90f7e),
 - Kilo Code VS Code extension with Grok,
-- Apache Superset to browse Postgres data
+- Apache Superset to browse Iceberg data via Trino
+- DuckDB as the dbt execution engine writing to Apache Iceberg tables stored in MinIO
 
 This is a post in the series titled "Data Contracts with dbt"
 
@@ -103,20 +104,22 @@ podman compose up -d
 
 ## Running this project
 
-1. Set up a `profiles.yml` called `jaffle_shop` to connect to a data warehouse
+1. Set up a `profiles.yml` called `jaffle_shop` to connect to DuckDB with Iceberg
 
 ```yaml
 jaffle_shop:
   target: dev
   outputs:
     dev:
-      type: postgres
-      host: localhost
-      user: dbt
-      password: dbt
-      port: 5432
-      dbname: dbt
-      schema: jaffle-shop-classic
+      type: duckdb
+      path: /tmp/dbt.duckdb
+      settings:
+        s3_region: us-east-1
+        s3_access_key_id: minioadmin
+        s3_secret_access_key: minioadmin
+        s3_endpoint: localhost:9000
+        s3_use_ssl: false
+        s3_url_style: path
       threads: 4
 ```
 
@@ -221,24 +224,20 @@ Apache Superset is included in the docker-compose setup for data visualization a
 
 ### Database Connection
 
-The dbt database is automatically added as a data source during Superset initialization. You can immediately start creating charts and dashboards using the dbt-transformed data in the following schemas:
+Superset connects to Trino for querying Iceberg data. Add a Trino database connection:
 
-- **Main models**: `jaffle-shop-classic` schema (staging and marts models)
-- **Analytics models**: `ddi` schema (rolling 30-day orders analysis)
-
-If you need to manually add or modify database connections:
 1. Log in to Superset with the admin credentials
 2. Go to **Data** > **Databases** in the top menu
 3. Click **+ Database**
-4. Select **PostgreSQL** as the database type
+4. Select **Trino** as the database type
 5. Enter the following connection details:
-   - **Host**: `postgres`
-   - **Port**: `5432`
-   - **Database Name**: `dbt`
-   - **Username**: `dbt`
-   - **Password**: `dbt`
+   - **Host**: `trino`
+   - **Port**: `8080`
+   - **Catalog**: `jaffle_iceberg`
 6. Click **Test Connection** to verify
 7. Click **Add** to save the database
+
+You can then create charts and dashboards using the Iceberg tables in the catalog.
 
 ## Data-Driven Insights (DDI) Schema
 
@@ -251,7 +250,7 @@ The `rolling_30_day_orders` model provides time-series analysis of completed ord
 - **Daily aggregations**: Total amount and order count per day
 - **Rolling metrics**: 30-day rolling sums and averages
 - **Trend analysis**: Last 50 data points for recent trend visualization
-- **ANSI SQL compliance**: Portable across PostgreSQL, Snowflake, BigQuery, Redshift, etc.
+- **ANSI SQL compliance**: Portable across DuckDB, PostgreSQL, Snowflake, BigQuery, Redshift, etc.
 
 #### Model Structure
 - **order_date**: Date of orders (DATE)
@@ -270,18 +269,16 @@ The model enforces strict data quality contracts including:
 
 #### Usage in Superset
 1. Navigate to **Data** > **Datasets**
-2. Select the `dbt` database
-3. Choose the `dbt_ddi.rolling_30_day_orders` table (note: `dbt_` prefix + `ddi` schema)
+2. Select the `trino` database
+3. Choose the `jaffle_iceberg.ddi.rolling_30_day_orders` table
 4. Create charts using the rolling metrics for trend analysis
 5. Use time-series charts to visualize order patterns over the 30-day windows
 
-**Note**: Tables are organized by schema:
-- Main models (customers, orders, staging): `dbt.jaffle-shop-classic.{table_name}`
-- Analytics models (rolling metrics): `dbt.ddi.{table_name}`
+**Note**: Tables are organized by schema in the Iceberg catalog.
 
 ## Trino Cluster
 
-The setup includes a Trino cluster that registers the Postgres database in the catalog named `jaffle_postgres`. Trino provides a federated query engine allowing SQL queries across multiple data sources.
+The setup includes a Trino cluster that provides access to Iceberg tables stored in MinIO via the REST catalog. Trino serves as the query interface for users and BI tools.
 
 ### Accessing Trino
 
@@ -296,22 +293,9 @@ After running `podman compose up -d` or `docker-compose up -d`, Trino will be av
 3. Enter the following connection details:
    - **Host**: `localhost`
    - **Port**: `8080`
-   - **Database/Schema**: `jaffle_postgres`
+   - **Database/Schema**: `jaffle_iceberg`
 4. No username or password is required (default configuration)
 5. Click **Test Connection** to verify
 6. Click **Finish** to save the connection
 
-#### Connecting to Postgres Directly
-
-1. In DBeaver, create a new connection
-2. Select **PostgreSQL** as the database type
-3. Enter the following connection details:
-   - **Host**: `localhost`
-   - **Port**: `5432`
-   - **Database**: `dbt`
-   - **Username**: `dbt`
-   - **Password**: `dbt`
-4. Click **Test Connection** to verify
-5. Click **Finish** to save the connection
-
-Note: The Trino user (`trino_user`) has limited access to `dbt_ddi` and `dbt_marts` schemas only, while the direct Postgres connection uses the `dbt` user with full access.
+Trino provides access to all Iceberg tables created by dbt.
