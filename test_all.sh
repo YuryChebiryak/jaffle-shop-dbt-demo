@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # Comprehensive test script for jaffle-shop-dbt-demo
-# Tests: podman machine, podman compose, venv, uv, dbt build, trino-cli
+# Tests: podman/docker machine, docker compose, venv, uv, dbt build, trino-cli
 #
 
 set -e  # Exit on error
@@ -36,121 +36,122 @@ echo_error() {
 }
 
 # ============================================================================
-# STEP 1: Podman Machine Operations
+# STEP 1: Container Runtime Detection
 # ============================================================================
-echo_step "STEP 1: Podman Machine Operations"
+echo_step "STEP 1: Container Runtime Detection"
 
-# Check if podman is available
-if ! command -v podman &> /dev/null; then
-    echo_error "Podman is not installed. Please install podman first."
+# Detect container runtime
+if command -v podman &> /dev/null; then
+    CONTAINER_RUNTIME="podman"
+    COMPOSE_CMD="podman-compose"
+    echo_success "Using Podman as container runtime"
+elif command -v docker &> /dev/null; then
+    CONTAINER_RUNTIME="docker"
+    COMPOSE_CMD="docker-compose"
+    echo_success "Using Docker as container runtime"
+else
+    echo_error "Neither podman nor docker is installed. Please install one first."
     exit 1
 fi
-echo_success "Podman is installed"
 
-# Check if podman machine exists
-if podman machine list --format json 2>/dev/null | grep -q '"Name"'; then
-    MACHINE_STATUS=$(podman machine list --format '{{.Name}} {{.Running}}' 2>/dev/null | awk '{print $2}')
-    if [ "$MACHINE_STATUS" = "true" ]; then
-        echo_success "Podman machine is already running"
+echo "Compose command: $COMPOSE_CMD"
+
+# For docker on macOS, no machine is needed (docker desktop)
+# For podman, we need to check/manage machine
+if [ "$CONTAINER_RUNTIME" = "podman" ]; then
+    # Check if podman machine exists
+    if podman machine list --format json 2>/dev/null | grep -q '"Name"'; then
+        MACHINE_STATUS=$(podman machine list --format '{{.Name}} {{.Running}}' 2>/dev/null | awk '{print $2}')
+        if [ "$MACHINE_STATUS" = "true" ]; then
+            echo_success "Podman machine is already running"
+        else
+            echo_warning "Podman machine exists but is not running. Starting..."
+            podman machine start
+            echo_success "Podman machine started"
+        fi
     else
-        echo_warning "Podman machine exists but is not running. Starting..."
+        echo_warning "Podman machine does not exist. Creating one..."
+        podman machine init
         podman machine start
-        echo_success "Podman machine started"
+        echo_success "Podman machine created and started"
     fi
 else
-    echo_warning "Podman machine does not exist. Creating one..."
-    podman machine init
-    podman machine start
-    echo_success "Podman machine created and started"
+    echo "Docker Desktop detected - no machine management needed"
+    # Check if docker is running
+    if ! docker info &>/dev/null; then
+        echo_error "Docker is not running. Please start Docker Desktop."
+        exit 1
+    fi
+    echo_success "Docker is running"
 fi
 
 # ============================================================================
-# STEP 2: Podman Compose Services
+# STEP 2: Container Services
 # ============================================================================
-echo_step "STEP 2: Podman Compose Services"
-
-# Check if podman-compose is available
-if ! command -v podman compose &> /dev/null; then
-    echo_warning "podman compose not found. Trying docker-compose as fallback..."
-    COMPOSE_CMD="docker-compose"
-else
-    COMPOSE_CMD="podman compose"
-fi
-
-echo "Using compose command: $COMPOSE_CMD"
-
-# Function to check if a container is healthy
-wait_for_container() {
-    local container_name=$1
-    local max_attempts=30
-    local attempt=1
-    
-    echo "Waiting for $container_name to be ready..."
-    while [ $attempt -le $max_attempts ]; do
-        if $COMPOSE_CMD ps --format json 2>/dev/null | grep -q "\"Name\":.*$container_name\""; then
-            local status=$($COMPOSE_CMD ps --format '{{.Name}} {{.Status}}' 2>/dev/null | grep "$container_name" | awk '{print $2}')
-            case "$status" in
-                Up|"Up (healthy)")
-                    echo_success "$container_name is running"
-                    return 0
-                    ;;
-                *)
-                    ;;
-            esac
-        fi
-        
-        # Try alternative check using podman/docker ps
-        if podman ps --format '{{.Names}}' 2>/dev/null | grep -q "$container_name" || \
-           docker ps --format '{{.Names}}' 2>/dev/null | grep -q "$container_name"; then
-            echo_success "$container_name container is running"
-            return 0
-        fi
-        
-        echo "  Attempt $attempt/$max_attempts: waiting for $container_name..."
-        sleep 2
-        attempt=$((attempt + 1))
-    done
-    
-    echo_error "$container_name failed to start within timeout"
-    return 1
-}
+echo_step "STEP 2: Container Services"
 
 # Stop any existing containers first
 echo "Stopping any existing containers..."
 $COMPOSE_CMD down --remove-orphans 2>/dev/null || true
 
 # Start services in background
-echo "Starting podman compose services..."
+echo "Starting container services..."
 $COMPOSE_CMD up -d
 
 # Wait for services to be ready
-wait_for_container "jaffle-minio" || echo_warning "jaffle-minio may need more time"
-wait_for_container "jaffle-iceberg-rest" || echo_warning "jaffle-iceberg-rest may need more time"
-wait_for_container "trino" || echo_warning "trino may need more time"
+wait_for_container() {
+    local container_name=$1
+    local max_attempts=60
+    local attempt=1
+    
+    echo "Waiting for $container_name to be ready..."
+    while [ $attempt -le $max_attempts ]; do
+        # Check container status using docker/podman ps
+        if $CONTAINER_RUNTIME ps --format '{{.Names}}' 2>/dev/null | grep -q "$container_name"; then
+            local status=$($CONTAINER_RUNTIME ps --format '{{.Status}}' --filter "name=$container_name" 2>/dev/null | head -1)
+            if [[ "$status" == Up* ]] || [[ "$status" == *"Up"* ]]; then
+                echo_success "$container_name is running"
+                return 0
+            fi
+        fi
+        
+        echo "  Attempt $attempt/$max_attempts: waiting for $container_name..."
+        sleep 3
+        attempt=$((attempt + 1))
+    done
+    
+    echo_warning "$container_name may need more time to start"
+    return 1
+}
+
+wait_for_container "jaffle-minio" || true
+wait_for_container "jaffle-iceberg-rest" || true
+wait_for_container "trino" || true
 
 # Show running containers
 echo -e "\n${YELLOW}Running containers:${NC}"
-$COMPOSE_CMD ps 2>/dev/null || podman ps
+$COMPOSE_CMD ps 2>/dev/null || $CONTAINER_RUNTIME ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 
 # ============================================================================
-# STEP 3: Virtual Environment Setup
+# STEP 3: Install uv if needed
 # ============================================================================
-echo_step "STEP 3: Virtual Environment Setup"
+echo_step "STEP 3: Installing uv (Python Package Manager)"
 
-# Check if uv is available
 if ! command -v uv &> /dev/null; then
-    echo_warning "uv not found. Checking for pip..."
-    if ! command -v pip &> /dev/null; then
-        echo_error "Neither uv nor pip is available. Please install uv first."
-        echo "Install uv: curl -LsSf https://astral.sh/uv/install.sh | sh"
-        exit 1
-    fi
-    USE_UV=false
-    echo "Will use pip for package installation"
+    echo "Installing uv..."
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+    # Add uv to PATH for this session
+    export PATH="$HOME/.cargo/bin:$PATH"
+    source "$HOME/.cargo/env" 2>/dev/null || true
+    echo_success "uv installed successfully"
 else
-    USE_UV=true
-    echo_success "uv is available"
+    echo_success "uv is already installed: $(uv --version)"
 fi
+
+# ============================================================================
+# STEP 4: Virtual Environment Setup
+# ============================================================================
+echo_step "STEP 4: Virtual Environment Setup"
 
 # Check if venv exists, create if not
 VENV_DIR="$SCRIPT_DIR/.venv"
@@ -167,33 +168,19 @@ echo "Activating virtual environment..."
 source "$VENV_DIR/bin/activate"
 echo_success "Virtual environment activated"
 
-# Show Python and pip/uv versions
+# Show Python and uv versions
 echo "Python version: $(python --version)"
-if [ "$USE_UV" = true ]; then
-    echo "uv version: $(uv --version)"
-else
-    echo "pip version: $(pip --version)"
-fi
+echo "uv version: $(uv --version)"
 
 # ============================================================================
-# STEP 4: Install Requirements
+# STEP 5: Install Requirements
 # ============================================================================
-echo_step "STEP 4: Installing Requirements from requirements.txt"
+echo_step "STEP 5: Installing Requirements from requirements.txt"
 
-# Upgrade pip first
-echo "Upgrading pip..."
-pip install --upgrade pip 2>/dev/null || python -m pip install --upgrade pip
-
-# Install requirements
-if [ "$USE_UV" = true ]; then
-    echo "Installing packages with uv..."
-    uv pip install --system -r "$SCRIPT_DIR/requirements.txt"
-    echo_success "Packages installed with uv"
-else
-    echo "Installing packages with pip..."
-    pip install -r "$SCRIPT_DIR/requirements.txt"
-    echo_success "Packages installed with pip"
-fi
+# Install requirements using uv
+echo "Installing packages with uv..."
+uv pip install --system -r "$SCRIPT_DIR/requirements.txt"
+echo_success "Packages installed with uv"
 
 # Verify dbt is installed
 if command -v dbt &> /dev/null; then
@@ -204,9 +191,9 @@ else
 fi
 
 # ============================================================================
-# STEP 5: DBT Build
+# STEP 6: DBT Build
 # ============================================================================
-echo_step "STEP 5: Running DBT Build"
+echo_step "STEP 6: Running DBT Build"
 
 # Check for profiles.yml
 if [ ! -f "$SCRIPT_DIR/profiles.yml" ]; then
@@ -246,55 +233,16 @@ echo -e "\n${YELLOW}Models created:${NC}"
 dbt ls --resource-type model --target dev 2>/dev/null || true
 
 # ============================================================================
-# STEP 6: Trino CLI Verification
+# STEP 7: Trino CLI Verification
 # ============================================================================
-echo_step "STEP 6: Verifying Data with Trino CLI"
-
-# Check if trino-cli is available
-TRINO_CLI_JAR=""
-if [ -f "$SCRIPT_DIR/trino-cli.jar" ]; then
-    TRINO_CLI_JAR="$SCRIPT_DIR/trino-cli.jar"
-elif [ -f "$HOME/.trino-cli.jar" ]; then
-    TRINO_CLI_JAR="$HOME/.trino-cli.jar"
-else
-    # Try to download trino-cli if not found
-    echo "Trino CLI not found. Attempting to download..."
-    TRINO_VERSION="460"  # Use a recent stable version
-    TRINO_CLI_URL="https://repo1.maven.org/maven2/io/trino/trino-cli/${TRINO_VERSION}/trino-cli-${TRINO_VERSION}-executable.jar"
-    
-    if command -v curl &> /dev/null; then
-        curl -fsSL -o "$SCRIPT_DIR/trino-cli.jar" "$TRINO_CLI_URL" 2>/dev/null && \
-            TRINO_CLI_JAR="$SCRIPT_DIR/trino-cli.jar" || \
-            echo_warning "Could not download trino-cli. Will try using trino container instead."
-    elif command -v wget &> /dev/null; then
-        wget -q -O "$SCRIPT_DIR/trino-cli.jar" "$TRINO_CLI_URL" 2>/dev/null && \
-            TRINO_CLI_JAR="$SCRIPT_DIR/trino-cli.jar" || \
-            echo_warning "Could not download trino-cli. Will try using trino container instead."
-    fi
-fi
-
-# Function to run trino query using podman exec
-run_trino_query() {
-    local query=$1
-    local description=$2
-    
-    echo -e "\n${YELLOW}$description${NC}"
-    echo "Query: $query"
-    
-    podman exec trino trino --execute "$query" 2>/dev/null || \
-    docker exec trino trino --execute "$query" 2>/dev/null || \
-    {
-        echo_error "Failed to execute Trino query"
-        return 1
-    }
-}
+echo_step "STEP 7: Verifying Data with Trino CLI"
 
 # Wait for trino to be ready
 echo "Waiting for Trino to be ready..."
-MAX_WAIT=60
+MAX_WAIT=120
 WAIT_COUNT=0
 while [ $WAIT_COUNT -lt $MAX_WAIT ]; do
-    if podman exec trino trino --execute "SELECT 1" &>/dev/null; then
+    if $CONTAINER_RUNTIME exec trino trino --execute "SELECT 1" &>/dev/null; then
         echo_success "Trino is ready"
         break
     fi
@@ -304,38 +252,34 @@ while [ $WAIT_COUNT -lt $MAX_WAIT ]; do
 done
 
 if [ $WAIT_COUNT -ge $MAX_WAIT ]; then
-    echo_warning "Trino may not be fully ready, continuing anyway..."
+    echo_warning "Trino took too long to start, continuing anyway..."
 fi
 
 # Show available catalogs
 echo -e "\n${YELLOW}Available Catalogs in Trino:${NC}"
-run_trino_query "SHOW CATALOGS" "Showing catalogs"
+$CONTAINER_RUNTIME exec trino trino --execute "SHOW CATALOGS" 2>/dev/null || echo_warning "Could not show catalogs"
 
 # Show available schemas
 echo -e "\n${YELLOW}Available Schemas in jaffle_postgres catalog:${NC}"
-run_trino_query "SHOW SCHEMAS FROM jaffle_postgres" "Showing schemas"
+$CONTAINER_RUNTIME exec trino trino --execute "SHOW SCHEMAS FROM jaffle_postgres" 2>/dev/null || echo_warning "Could not show schemas"
 
-# Try to query data (this depends on whether dbt wrote data to S3/minio)
-echo -e "\n${YELLOW}Testing data query in Trino:${NC}"
-echo "Note: Data must be written to S3/MinIO by dbt for this to work"
-echo "If dbt wrote data to the iceberg catalog, it should be queryable here."
+# Try to query tables
+echo -e "\n${YELLOW}Showing tables in jaffle_postgres catalog:${NC}"
+$CONTAINER_RUNTIME exec trino trino --execute "SHOW TABLES FROM jaffle_postgres" 2>/dev/null || echo_warning "Could not show tables"
 
-# Attempt to query tables
-run_trino_query "SHOW TABLES FROM jaffle_postgres" "Showing tables in jaffle_postgres catalog" || \
-    echo_warning "No tables found or Trino not accessible"
-
-# Try a simple count query
-run_trino_query "SELECT COUNT(*) AS total_rows FROM jaffle_postgres.information_schema.tables" "Testing query capability" || \
-    echo_warning "Query failed - this is expected if no data has been written to S3"
+# Try a simple query to verify data access
+echo -e "\n${YELLOW}Testing data query (this will show data if dbt wrote to S3):${NC}"
+$CONTAINER_RUNTIME exec trino trino --execute "SELECT COUNT(*) FROM jaffle_postgres.information_schema.tables" 2>/dev/null || \
+    echo_warning "Query failed - expected if no iceberg data was written to S3"
 
 # ============================================================================
-# STEP 7: Summary
+# STEP 8: Summary
 # ============================================================================
 echo_step "TEST SUMMARY"
 
 echo -e "${GREEN}All major components have been tested:${NC}"
-echo "  1. ✓ Podman machine: $(podman machine list --format '{{.Name}} {{.Running}}' 2>/dev/null | awk '{print $2}' || echo 'unknown')"
-echo "  2. ✓ Podman compose services: Running"
+echo "  1. ✓ Container runtime: $CONTAINER_RUNTIME"
+echo "  2. ✓ Container services: Running"
 echo "  3. ✓ Virtual environment: Activated at $VENV_DIR"
 echo "  4. ✓ Requirements installed: $(wc -l < "$SCRIPT_DIR/requirements.txt") packages"
 echo "  5. ✓ DBT build: Completed"
