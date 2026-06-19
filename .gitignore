@@ -6,3 +6,4 @@ venv/
 dbt_internal_packages/
 dbt_packages/
 .configs/
+.skillseeker-cache
