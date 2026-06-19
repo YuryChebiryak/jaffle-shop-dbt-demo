@@ -31,9 +31,25 @@ This is a post in the series titled "Data Contracts with dbt"
 
 [𝟏𝟎/𝟕 Testing Data Expectations in dbt](https://www.linkedin.com/feed/update/urn:li:activity:7380127053439819776/)
 
-11/7 Atomicity and Idempotence in Data Pipelines
+[11/7 Atomicity and Idempotence in Data Pipelines](https://www.linkedin.com/posts/yurychebiryak_𝟏𝟏𝟕-atomicity-and-idempotence-in-data-activity-7382663779572076544-uRdg?utm_source=share&utm_medium=member_ios&rcm=ACoAAAEI_0oB7fYEPncLP2s2k_qPhBZeQS5RO7s)
 
-12/7 Why MCP matters
+[12/7 Why MCP Matters](https://www.linkedin.com/feed/update/urn:li:activity:7385200486360027136/)
+
+[13/7 What is dbt MCP](https://www.linkedin.com/feed/update/urn:li:activity:7387737211452067840/)
+
+[14/7 - How to use dbt MCP in practice](https://www.linkedin.com/feed/update/urn:li:activity:7390289021819670528/)
+
+[Post 15 – Experimenting Safely with dbt clone and dbt defer](https://www.linkedin.com/feed/update/urn:li:activity:7392912843991330816/)
+
+[Post 16: Context Drift in Data-Driven Applications](https://www.linkedin.com/feed/update/urn:li:activity:7415468249125068801/)
+
+[Post 17 – Investigating Attribute Lineage with an LLM and dbt MCP](https://www.linkedin.com/feed/update/urn:li:activity:7398081603836579840/)
+
+[Post 18 – Validating dbt Models Against the Data Contract (without abusing data tests)](https://www.linkedin.com/feed/update/urn:li:activity:7400877372180152320/)
+
+[Post 19 Automating Data Quality Checks from dbt Contracts Using Soda](https://www.linkedin.com/feed/update/urn:li:activity:7405384020068376577/)
+
+[Post 20: Works in Staging, Breaks in Prod](https://www.linkedin.com/feed/update/urn:li:activity:7418222409335377920/)
 
 (C) 2025 Chebiryak Consulting https://consulting.chebiryak.name/about-me/
 
