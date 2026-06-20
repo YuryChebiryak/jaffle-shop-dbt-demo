@@ -12,7 +12,7 @@ import sys
 import requests
 
 SUPERSET_URL = "http://localhost:8088"
-TRINO_URI = "trino://trino_user@trino:8080/lakehouse"
+TRINO_URI = "trino://trino_user@trino:8080/lakehouse/ddi"
 DB_NAME = "Trino Lakehouse"
 DASHBOARD_TITLE = "Rolling Sales Dashboard (Trino/Iceberg)"
 
@@ -99,7 +99,8 @@ def ensure_dataset(client, db_id, schema, table):
             ds_id = ds["id"]
             resp = client.put(
                 f"/api/v1/dataset/{ds_id}",
-                json={"database_id": db_id, "schema": schema, "table_name": table},
+                # catalog=null so Superset uses the default from the connection URI
+                json={"database_id": db_id, "catalog": None, "schema": schema, "table_name": table},
             )
             if resp.status_code in (200, 201):
                 print(f"  [migrated] dataset '{table}' id={ds_id} → {schema} on db {db_id}")
