@@ -1,0 +1,10 @@
+data_source jaffle_shop_datasource:
+  type: trino
+  connection:
+    host: localhost
+    port: 8080
+    http_scheme: http
+    auth_type: NoAuthentication
+    catalog: lakehouse
+    schema: ddi
+    username: trino_user

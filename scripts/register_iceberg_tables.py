@@ -48,23 +48,24 @@ def s3_client():
 
 
 def latest_metadata_key(s3, prefix):
+    # version-hint.text is the authoritative pointer to the current metadata file.
+    # DuckDB writes UUID-named metadata files and sets this hint after each build.
+    try:
+        hint = s3.get_object(Bucket=BUCKET, Key=prefix + "metadata/version-hint.text")
+        uuid = hint["Body"].read().decode().strip()
+        return f"{prefix}metadata/{uuid}.metadata.json"
+    except s3.exceptions.NoSuchKey:
+        pass
+
+    # Fallback: find the newest metadata.json by LastModified timestamp.
     resp = s3.list_objects_v2(Bucket=BUCKET, Prefix=prefix + "metadata/")
-    keys = [
-        o["Key"]
-        for o in resp.get("Contents", [])
+    candidates = [
+        o for o in resp.get("Contents", [])
         if o["Key"].endswith(".metadata.json")
     ]
-    if not keys:
+    if not candidates:
         raise FileNotFoundError(f"No metadata found under s3://{BUCKET}/{prefix}")
-
-    def version(k):
-        m = re.search(r"v(\d+)\.metadata\.json$", k)
-        return int(m.group(1)) if m else -1
-
-    # Prefer versioned files (v1.metadata.json, v2.metadata.json, …);
-    # fall back to UUID-named files if none found.
-    versioned = [k for k in keys if version(k) >= 0]
-    return sorted(versioned or keys, key=version)[-1]
+    return max(candidates, key=lambda o: o["LastModified"])["Key"]
 
 
 def patch_and_upload(s3, key):

@@ -1,4 +1,4 @@
-checks for dbt_ddi.rolling_30_day_orders:
+checks for rolling_30_day_orders:
 - row_count > 0:
     name: Has some rows
 - missing_count(order_date) = 0:

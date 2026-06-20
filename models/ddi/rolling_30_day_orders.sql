@@ -7,7 +7,7 @@
 WITH completed_orders AS (
     SELECT
         CAST(o.order_date AS DATE) AS order_date,
-        CAST(p.amount AS DECIMAL(38,8)) AS amount
+        p.amount  -- cents, BIGINT
     FROM {{ ref('stg_orders') }} o
     INNER JOIN {{ ref('stg_payments') }} p
         ON o.order_id = p.order_id
@@ -17,8 +17,8 @@ WITH completed_orders AS (
 daily_totals AS (
     SELECT
         order_date,
-        CAST(SUM(amount) AS DECIMAL(38,8)) AS total_amount,
-        CAST(COUNT(*) AS DECIMAL(38,8)) AS order_count
+        SUM(amount) AS total_amount_cents,
+        COUNT(*) AS order_count
     FROM completed_orders
     GROUP BY order_date
 ),
@@ -26,30 +26,30 @@ daily_totals AS (
 rolling_30_day AS (
     SELECT
         order_date,
-        total_amount,
+        total_amount_cents,
         order_count,
-        CAST(SUM(total_amount) OVER (
+        SUM(total_amount_cents) OVER (
             ORDER BY order_date
             ROWS BETWEEN 29 PRECEDING AND CURRENT ROW
-        ) AS DECIMAL(38,8)) AS rolling_30_day_amount,
-        CAST(SUM(order_count) OVER (
+        ) AS rolling_30_day_amount_cents,
+        SUM(order_count) OVER (
             ORDER BY order_date
             ROWS BETWEEN 29 PRECEDING AND CURRENT ROW
-        ) AS DECIMAL(38,8)) AS rolling_30_day_orders,
-        CAST(AVG(total_amount) OVER (
+        ) AS rolling_30_day_orders,
+        AVG(total_amount_cents) OVER (
             ORDER BY order_date
             ROWS BETWEEN 29 PRECEDING AND CURRENT ROW
-        ) AS DECIMAL(38,8)) AS rolling_30_day_avg_daily
+        ) AS rolling_30_day_avg_daily_cents
     FROM daily_totals
 )
 
 SELECT
     order_date,
-    total_amount,
+    CAST(total_amount_cents / 100.0 AS DECIMAL(18,2))          AS total_amount,
     order_count,
-    rolling_30_day_amount,
-    rolling_30_day_orders,
-    rolling_30_day_avg_daily
+    CAST(rolling_30_day_amount_cents / 100.0 AS DECIMAL(18,2)) AS rolling_30_day_amount,
+    CAST(rolling_30_day_orders AS BIGINT) AS rolling_30_day_orders,
+    CAST(rolling_30_day_avg_daily_cents / 100.0 AS DECIMAL(18,2)) AS rolling_30_day_avg_daily
 FROM rolling_30_day
 ORDER BY order_date DESC
 FETCH FIRST 50 ROWS ONLY

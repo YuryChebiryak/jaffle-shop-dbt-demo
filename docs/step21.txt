@@ -1,0 +1,93 @@
+Post 21: From PostgreSQL to DuckDB + Apache Iceberg — an Open Lakehouse
+
+In the previous posts we built a dbt pipeline with enforced data contracts, federated queries through Trino, and automated quality checks with Soda. The whole thing ran on PostgreSQL. PostgreSQL is a fantastic database, but it was doing two unrelated jobs at once: acting as both the compute engine and the storage layer. This post is about separating those concerns.
+
+─────────────────────────────────────
+WHY MOVE AWAY FROM POSTGRESQL?
+─────────────────────────────────────
+
+When PostgreSQL is your only engine, your data is only accessible to engines that can connect to it over the wire. Trino could query it through a JDBC connector, but that meant all reads went through the Postgres process — no columnar pushdown, no predicate pruning at the storage layer, no way for a second engine to read the same data without going through Postgres as a gatekeeper.
+
+The moment you separate storage from compute, every engine becomes a first-class citizen. DuckDB writes, Trino reads. Or Spark reads. Or DuckDB reads what Spark wrote. The file format — Apache Iceberg — is the contract between them, not the database server.
+
+─────────────────────────────────────
+THE NEW STACK
+─────────────────────────────────────
+
+• DuckDB — dbt's execution engine. Runs locally, no server, consumes seed CSVs and executes SQL transformations in memory. Writes Iceberg files directly to S3.
+
+• Apache Iceberg — the table format. Parquet data files plus metadata JSON that describes the current snapshot, schema, partition spec, and sort order. Any Iceberg-aware engine can read a table written by any other Iceberg-aware engine.
+
+• MinIO — S3-compatible object storage running in a container. Holds all Parquet data files and Iceberg metadata under s3://lakehouse/. This is now the system of record. PostgreSQL held data in a process. MinIO holds data in files — durable, accessible, engine-agnostic.
+
+• Iceberg REST catalog (tabulario/iceberg-rest) — a lightweight container that maps (namespace, table_name) → current metadata location on S3. DuckDB writes files to S3, then a post-build script registers the new snapshot in the catalog. Trino discovers table locations from the catalog, not from config files.
+
+• Trino — still the federated query engine for dashboards and DBeaver. Now uses the Iceberg connector pointed at the REST catalog instead of a JDBC connection to Postgres.
+
+─────────────────────────────────────
+WHAT WE KEPT: DATA CONTRACTS
+─────────────────────────────────────
+
+contract: enforced: true stayed in every schema.yml. dbt validates column names and types before writing — the migration changed the engine, not the quality bar. Three layers of enforcement remain in place:
+
+1. dbt native contract — validates schema at build time before writing to Iceberg.
+2. validate_contracts macro — post-build cross-check comparing the live Iceberg schema against the contract spec for all serving-tagged models.
+3. Soda checks — generated from the same schema.yml contracts, now running against Trino (which reads the Iceberg tables) instead of Postgres.
+
+─────────────────────────────────────
+PRACTICAL GOTCHAS
+─────────────────────────────────────
+
+Several things that looked straightforward in the plan turned out to need extra work:
+
+DuckDB can't attach an Iceberg REST catalog directly.
+DuckDB 1.4.5+ requires OAuth2 when you ATTACH a REST catalog. There is no bypass. The workaround: write Iceberg files to S3 with COPY ... TO ... (FORMAT ICEBERG, ALLOW_OVERWRITE TRUE), then register the written metadata in the REST catalog using PyIceberg after the build. The catalog still becomes the single source of truth — Trino and any other engine that connects to it gets the S3 path from the catalog, not from hardcoded config.
+
+DuckDB's SUM always returns HUGEINT.
+Unlike PostgreSQL where SUM(integer) returns integer, DuckDB widens every aggregation result to HUGEINT (128-bit) to prevent overflow. If your contract declares bigint, you need an explicit CAST. This is correct behavior — it just has to be explicit.
+
+DuckDB integer division returns DOUBLE, not INTEGER.
+2400 / 100 in DuckDB = 24.0, not 24. PostgreSQL returns 24. This means any division of integers in staging flows downstream as a floating-point type, and all aggregations on that column fail the contract check.
+
+This prompted a real design decision: where should currency conversion live?
+
+In the data lake (marts), amounts are stored in cents as BIGINT. No division, no floating-point, no precision loss. The lake preserves the raw value exactly.
+
+In the presentation layer (DDI models), amounts are divided by 100.0 and cast to DECIMAL(18,2). Consumer-facing output shows dollars with two decimal places. The conversion happens once, at the boundary between the lake and the presentation layer, and is explicit in the SQL.
+
+DuckDB writes incomplete Iceberg metadata.
+The Iceberg specification requires a last-sequence-number field in table metadata and a sort-orders list containing at least the default unsorted order. DuckDB writes neither. The REST catalog's registerTable endpoint rejects both omissions. A post-build Python script patches both fields before registration. This is a known limitation of DuckDB's Iceberg writer as of version 1.5.x.
+
+The version-hint.text file is the authoritative metadata pointer.
+DuckDB names Iceberg metadata files with UUIDs, not sequential version numbers. After multiple builds, several metadata files exist. Sorting by name is wrong — the alphabetically last UUID is not necessarily the most recent. Reading version-hint.text, which DuckDB updates after every successful write, gives the correct current metadata UUID.
+
+─────────────────────────────────────
+EVERYTHING IN ONE SCRIPT
+─────────────────────────────────────
+
+A refactoring that breaks a data contract should fail visibly, not silently drift into production. We compiled the full pipeline into a single run_checks.sh:
+
+1. Start Podman infrastructure (idempotent — skips if already running)
+2. Wait for Trino to report healthy
+3. dbt build (seed + run + test, 59 checks)
+4. Register Iceberg tables in the REST catalog
+5. validate_contracts macro (4 serving models)
+6. Regenerate Soda checks from schema.yml
+7. Soda scan via Trino (34 checks across rolling_30_day_orders and at_risk_customers)
+
+Total runtime: ~6 seconds. Pass/fail on exit code. This is the script you run before committing a model change.
+
+─────────────────────────────────────
+THE ARCHITECTURE NOW
+─────────────────────────────────────
+
+PostgreSQL held data in a process. If the process was down, the data was inaccessible.
+Iceberg on MinIO holds data in files. The files exist independently of any engine. DuckDB can read them. Trino can read them. Spark can read them. A new engine added next year can read them without touching the pipeline.
+
+Compute and storage are no longer the same thing. That is the whole point.
+
+─────────────────────────────────────
+
+The code is at: https://github.com/YuryChebiryak/jaffle-shop-dbt-demo
+
+#dbt #DuckDB #ApacheIceberg #DataEngineering #DataContracts #OpenLakehouse #Trino #MinIO #DataQuality #Soda

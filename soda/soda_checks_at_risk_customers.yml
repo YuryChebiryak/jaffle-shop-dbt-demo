@@ -1,4 +1,4 @@
-checks for dbt_ddi.at_risk_customers:
+checks for at_risk_customers:
 - row_count > 0:
     name: Has some rows
 - duplicate_count(customer_id) = 0:

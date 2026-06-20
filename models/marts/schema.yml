@@ -37,7 +37,7 @@ models:
         data_type: bigint
 
       - name: customer_lifetime_value
-        description: Total value (AUD) of a customer's orders
+        description: Total value of a customer's orders, in cents
         data_type: bigint
 
   - name: orders
@@ -78,31 +78,31 @@ models:
                 values: ['placed', 'shipped', 'completed', 'return_pending', 'returned']
 
       - name: amount
-        description: Total amount (AUD) of the order
+        description: Total amount of the order, in cents
         data_type: bigint
         tests:
           - not_null
 
       - name: credit_card_amount
-        description: Amount of the order (AUD) paid for by credit card
+        description: Amount paid by credit card, in cents
         data_type: bigint
         tests:
           - not_null
 
       - name: coupon_amount
-        description: Amount of the order (AUD) paid for by coupon
+        description: Amount paid by coupon, in cents
         data_type: bigint
         tests:
           - not_null
 
       - name: bank_transfer_amount
-        description: Amount of the order (AUD) paid for by bank transfer
+        description: Amount paid by bank transfer, in cents
         data_type: bigint
         tests:
           - not_null
 
       - name: gift_card_amount
-        description: Amount of the order (AUD) paid for by gift card
+        description: Amount paid by gift card, in cents
         data_type: bigint
         tests:
           - not_null
