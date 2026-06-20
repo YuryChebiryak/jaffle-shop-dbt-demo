@@ -38,9 +38,9 @@ at_risk_customers as (
         cos.first_order_date,
         cos.last_order_date,
         cos.total_orders,
-        cos.completed_orders,
+        CAST(cos.completed_orders AS BIGINT) as completed_orders,
         cd.current_date as reference_date,
-        (cd.current_date - cos.last_order_date) as days_since_last_order
+        CAST((cd.current_date - cos.last_order_date) AS INTEGER) as days_since_last_order
     from customers c
     inner join customer_order_summary cos
         on c.customer_id = cos.customer_id

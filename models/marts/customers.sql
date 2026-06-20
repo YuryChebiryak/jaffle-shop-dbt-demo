@@ -34,7 +34,7 @@ customer_payments as (
 
     select
         orders.customer_id,
-        sum(amount) as total_amount
+        CAST(sum(amount) AS BIGINT) as total_amount
 
     from payments
 

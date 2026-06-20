@@ -18,10 +18,10 @@ order_payments as (
         order_id,
 
         {% for payment_method in payment_methods -%}
-        sum(case when payment_method = '{{ payment_method }}' then amount else 0 end) as {{ payment_method }}_amount,
+        CAST(sum(case when payment_method = '{{ payment_method }}' then amount else 0 end) AS BIGINT) as {{ payment_method }}_amount,
         {% endfor -%}
 
-        sum(amount) as total_amount
+        CAST(sum(amount) AS BIGINT) as total_amount
 
     from payments
 

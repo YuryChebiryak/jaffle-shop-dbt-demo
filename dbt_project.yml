@@ -24,26 +24,24 @@ data_tests:
 
 models:
   jaffle_shop:
-      +persist_docs:
-        relation: true
-        columns: true
       seeds:
         +schema: seeds
-      +materialized: table
       staging:
         +schema: staging
         +materialized: view
         +docs:
-          node_color: '#C0C0C0'  # Silver
+          node_color: '#C0C0C0'
       marts:
         +schema: marts
-        +materialized: table
+        +materialized: external
+        +format: iceberg
         +docs:
-          node_color: '#B8860B'  # Dark Gold
+          node_color: '#B8860B'
       ddi:
-        +materialized: table
         +schema: ddi
+        +materialized: external
+        +format: iceberg
         +docs:
-          node_color: '#B8860B'  # Dark Gold
+          node_color: '#B8860B'
       +docs:
-        node_color: '#CD7F32'    # Bronze
+        node_color: '#CD7F32'
