@@ -63,5 +63,16 @@ echo "==> Running Soda checks: at_risk_customers"
 soda scan -d jaffle_shop_datasource -c soda/configuration.yml \
   soda/soda_checks_at_risk_customers.yml
 
+
+# ── 6. Superset setup (idempotent) ───────────────────────────────────────────
+echo ""
+echo "==> Setting up Superset (Trino database, datasets, dashboard)"
+python scripts/setup_superset.py
+
+# ── 7. Superset integration tests ────────────────────────────────────────────
+echo ""
+echo "==> Running Superset integration tests"
+python scripts/test_superset.py
+
 echo ""
 echo "All checks passed."
