@@ -48,7 +48,12 @@ echo ""
 echo "==> Validating dbt contracts (serving-tagged models)"
 dbt run-operation validate_contracts
 
-# ── 5. Soda checks ───────────────────────────────────────────────────────────
+# ── 5. Trino + Iceberg integration tests ────────────────────────────────────
+echo ""
+echo "==> Trino + Iceberg integration tests"
+python scripts/test_trino.py
+
+# ── 7. Soda checks ───────────────────────────────────────────────────────────
 echo ""
 echo "==> Generating Soda checks from dbt contracts"
 python scripts/generate_soda_from_dbt_contract.py
@@ -64,12 +69,12 @@ soda scan -d jaffle_shop_datasource -c soda/configuration.yml \
   soda/soda_checks_at_risk_customers.yml
 
 
-# ── 6. Superset setup (idempotent) ───────────────────────────────────────────
+# ── 8. Superset setup (idempotent) ───────────────────────────────────────────
 echo ""
 echo "==> Setting up Superset (Trino database, datasets, dashboard)"
 python scripts/setup_superset.py
 
-# ── 7. Superset integration tests ────────────────────────────────────────────
+# ── 9. Superset integration tests ────────────────────────────────────────────
 echo ""
 echo "==> Running Superset integration tests"
 python scripts/test_superset.py
