@@ -1,108 +1,132 @@
 This repository explores how data contracts can be defined and enforced for the classic Jaffle Shop dbt demo.
 
-Medium article with the original setup of dbt with a local postgres:
-[Medium Link](https://medium.com/@snhou/running-the-jaffle-shop-dbt-project-in-seconds-47bf72363744)
-
-Our setup is different from the original repo in that
-- we use `uv` instead of `pip` [see why](https://medium.com/@sumakbn/uv-vs-pip-revolutionizing-python-package-management-576915e90f7e),
-- `podman` instead of `Docker` [see why](https://medium.com/@sumakbn/uv-vs-pip-revolutionizing-python-package-management-576915e90f7e),
-- Kilo Code VS Code extension with Grok,
-- Apache Superset to browse Postgres data
-
-This is a post in the series titled "Data Contracts with dbt"
+This is a post series titled "Data Contracts with dbt":
 
 [1/7: Why Data Contracts Matter](https://www.linkedin.com/feed/update/urn:li:activity:7367654714525642753/)
-
 [2/7 Declaring Data Contracts in dbt](https://www.linkedin.com/feed/update/urn:li:activity:7369170884021964801/)
-
 [3/7 Enforcing with Data Tests](https://www.linkedin.com/feed/update/urn:li:activity:7369463558130098178/)
-
 [4/7 Documentation Matters](https://www.linkedin.com/feed/update/urn:li:activity:7370036803829063680/?updateEntityUrn=urn%3Ali%3Afs_feedUpdate%3A%28V2%2Curn%3Ali%3Aactivity%3A7370036803829063680%29)
-
 [5/7 Tracking Data Consumers with dbt Exposures](https://www.linkedin.com/feed/update/urn:li:activity:7370761583909568512/?updateEntityUrn=urn%3Ali%3Afs_feedUpdate%3A%28V2%2Curn%3Ali%3Aactivity%3A7370761583909568512%29)
-
 [6/7 Data Contracts, ELT, and the role of DBT](https://www.linkedin.com/feed/update/urn:li:activity:7371108866610126848/?updateEntityUrn=urn%3Ali%3Afs_feedUpdate%3A%28V2%2Curn%3Ali%3Aactivity%3A7371108866610126848%29)
-
 [7/7 Digging into Failures with store_failures](https://www.linkedin.com/feed/update/urn:li:activity:7371856485129011201/?updateEntityUrn=urn%3Ali%3Afs_feedUpdate%3A%28V2%2Curn%3Ali%3Aactivity%3A7371856485129011201%29)
-
 [8/7 Testing Data Contracts with datacontract.com CLI](https://www.linkedin.com/feed/update/urn:li:activity:7375296445676945408/?updateEntityUrn=urn%3Ali%3Afs_feedUpdate%3A%28V2%2Curn%3Ali%3Aactivity%3A7375296445676945408%29)
-
-[9/7 𝐅𝐞𝐝𝐞𝐫𝐚𝐭𝐞𝐝 𝐀𝐜𝐜𝐞𝐬𝐬 𝐰𝐢𝐭𝐡 𝐓𝐫𝐢𝐧𝐨](https://www.linkedin.com/posts/yurychebiryak_datamesh-dbt-vibecoding-activity-7377590326426775552-ELRJ?utm_source=share&utm_medium=member_ios&rcm=ACoAAAEI_0oB7fYEPncLP2s2k_qPhBZeQS5RO7s)
-
-[𝟏𝟎/𝟕 Testing Data Expectations in dbt](https://www.linkedin.com/feed/update/urn:li:activity:7380127053439819776/)
-
+[9/7 Federated Access with Trino](https://www.linkedin.com/posts/yurychebiryak_datamesh-dbt-vibecoding-activity-7377590326426775552-ELRJ?utm_source=share&utm_medium=member_ios&rcm=ACoAAAEI_0oB7fYEPncLP2s2k_qPhBZeQS5RO7s)
+[10/7 Testing Data Expectations in dbt](https://www.linkedin.com/feed/update/urn:li:activity:7380127053439819776/)
 [11/7 Atomicity and Idempotence in Data Pipelines](https://www.linkedin.com/posts/yurychebiryak_𝟏𝟏𝟕-atomicity-and-idempotence-in-data-activity-7382663779572076544-uRdg?utm_source=share&utm_medium=member_ios&rcm=ACoAAAEI_0oB7fYEPncLP2s2k_qPhBZeQS5RO7s)
-
 [12/7 Why MCP Matters](https://www.linkedin.com/feed/update/urn:li:activity:7385200486360027136/)
-
 [13/7 What is dbt MCP](https://www.linkedin.com/feed/update/urn:li:activity:7387737211452067840/)
-
-[14/7 - How to use dbt MCP in practice](https://www.linkedin.com/feed/update/urn:li:activity:7390289021819670528/)
-
+[14/7 How to use dbt MCP in practice](https://www.linkedin.com/feed/update/urn:li:activity:7390289021819670528/)
 [Post 15 – Experimenting Safely with dbt clone and dbt defer](https://www.linkedin.com/feed/update/urn:li:activity:7392912843991330816/)
-
 [Post 16: Context Drift in Data-Driven Applications](https://www.linkedin.com/feed/update/urn:li:activity:7415468249125068801/)
-
 [Post 17 – Investigating Attribute Lineage with an LLM and dbt MCP](https://www.linkedin.com/feed/update/urn:li:activity:7398081603836579840/)
-
 [Post 18 – Validating dbt Models Against the Data Contract (without abusing data tests)](https://www.linkedin.com/feed/update/urn:li:activity:7400877372180152320/)
-
 [Post 19 Automating Data Quality Checks from dbt Contracts Using Soda](https://www.linkedin.com/feed/update/urn:li:activity:7405384020068376577/)
-
 [Post 20: Works in Staging, Breaks in Prod](https://www.linkedin.com/feed/update/urn:li:activity:7418222409335377920/)
-
+[Post 21: dbt + DuckDB + Apache Iceberg — an Open Lakehouse](https://www.linkedin.com/feed/update/urn:li:activity:7418222409335377920/)
 
 (C) 2025 Chebiryak Consulting https://consulting.chebiryak.name/about-me/
 
-![Jaffle Shop Architecture](etc/architecture_diagram.png)
+---
+
+## Architecture
+
+This project has evolved from a PostgreSQL-backed dbt setup to an **open lakehouse** architecture built on DuckDB + Apache Iceberg + MinIO.
+
+### Stack
+
+| Component | Role |
+|---|---|
+| **DuckDB** | dbt execution engine; writes Iceberg files directly to S3 |
+| **Apache Iceberg** | Open table format; stores Parquet data + metadata on MinIO |
+| **MinIO** | S3-compatible object storage (`s3://lakehouse/`) |
+| **Iceberg REST catalog** (`tabulario/iceberg-rest`) | Metadata catalog; engines discover table locations here |
+| **Trino** | Federated query engine; reads Iceberg tables via REST catalog |
+| **Apache Superset** | Visualization layer; connects via Trino |
+
+### Data Flow
+
+```
+dbt build
+  └─ DuckDB executes SQL models
+       └─ COPY ... TO 's3://lakehouse/<model>.iceberg/' (FORMAT ICEBERG)
+            └─ MinIO stores Parquet data + Iceberg metadata files
+
+python register_iceberg_tables.py
+  └─ Scans MinIO for latest metadata.json per table
+  └─ Patches DuckDB metadata omissions (last-sequence-number, sort-orders)
+  └─ Registers each table in the Iceberg REST catalog
+
+Trino (catalog: lakehouse)
+  └─ Queries REST catalog for table location
+  └─ Reads Parquet files from MinIO
+```
+
+### dbt Model Layers
+
+| Layer | Path | Materialization | Schema |
+|---|---|---|---|
+| Staging | `models/staging/` | view | `staging` |
+| Marts | `models/marts/` | external (Iceberg) | `marts` |
+| DDI | `models/ddi/` | external (Iceberg) | `ddi` |
+
+Marts and DDI models are written as Iceberg tables at `s3://lakehouse/<model>.iceberg/`. The path is derived automatically from `external_root: s3://lakehouse` in `profiles.yml` — no per-model S3 location is hardcoded.
+
+### Data Contract Enforcement
+
+All marts and DDI models carry `contract: enforced: true` in their `schema.yml`. dbt validates column names and types at build time. Two additional layers run on top:
+
+1. **`validate_contracts` macro** — post-build cross-check comparing live schema against the contract spec for models tagged `serving`. Catches missing columns, extra columns, and type mismatches.
+2. **Soda checks** — generated from dbt tests via `generate_soda_from_dbt_contract.py`; runs as an independent quality gate.
+
+### Why DuckDB writes Iceberg directly (no catalog attach)
+
+DuckDB 1.4.5+ requires OAuth2 when attaching an Iceberg REST catalog (`ATTACH ... (TYPE ICEBERG)`). There is no bypass. Instead this project uses DuckDB's `COPY ... TO ... (FORMAT ICEBERG)` to write Iceberg files directly to MinIO, then `register_iceberg_tables.py` registers the written metadata in the REST catalog. The REST catalog becomes the single source of truth for table locations — Trino and any other engine that connects to it receives the S3 path from the catalog, not from config.
+
+### Infrastructure Services
+
+| Service | Port | Credentials |
+|---|---|---|
+| MinIO (S3) | 9000 (API), 9001 (console) | minioadmin / minioadmin |
+| Iceberg REST catalog | 8181 | no auth |
+| Trino | 8080 | no auth |
+| Apache Superset | 8088 | admin / admin |
+
+---
 
 ## Prerequisites
+
 1. git
 2. Python 3.9 or higher
+3. Podman (used instead of Docker)
 
+---
 
-## Setup environment
+## Setup
 
-1. Clone this repository
+### 1. Clone the repository
+
 ```bash
 git clone https://github.com/YuryChebiryak/jaffle-shop-dbt-demo.git
-```
-2. Change into the `jaffle_shop` directory
-```bash
 cd jaffle-shop-dbt-demo
-``` 
+```
 
-3. Install virtual environment
-``` bash
+### 2. Create and activate a virtual environment
+
+```bash
 python3 -m venv venv
-```
-
-4. Enter into venv
-```bash
 source venv/bin/activate
-```
-
-5. Update pip
-```bash
 python3 -m pip install --upgrade pip
-```
-
-6. Install uv
-```bash
 pip install uv
-```
-
-6. Install dependencies
-```bash
 uv pip install -r requirements.txt
 ```
 
-7. Install dbt packages
+### 3. Install dbt packages
+
 ```bash
 dbt deps
 ```
 
-7. Install podman, initialize it and start it
+### 4. Install and start Podman
 
 ```bash
 brew install podman
@@ -110,225 +134,161 @@ podman machine init
 podman machine start
 ```
 
-7. Run Podman
-```bash
-podman compose build
-```
+### 5. Start infrastructure
+
 ```bash
 podman compose up -d
 ```
 
-## Running this project
+This starts MinIO, the Iceberg REST catalog, Trino, and Superset.
 
-1. Set up a `profiles.yml` called `jaffle_shop` to connect to a data warehouse
-
-```yaml
-jaffle_shop:
-  target: dev
-  outputs:
-    dev:
-      type: postgres
-      host: localhost
-      user: dbt
-      password: dbt
-      port: 5432
-      dbname: dbt
-      schema: jaffle-shop-classic
-      threads: 4
-```
-
-2. Ensure your profile is setup correctly from the command line:
-```bash
-dbt debug
-```
-* it will generate a `.user.yml` file
- 
-3. Load the CSVs with the demo data set. This materializes the CSVs as tables in your target schema. Note that a typical dbt project **does not require this step** since dbt assumes your raw data is already in your warehouse.
-```bash
-dbt seed
-```
-
-4. Run the models:
-```bash
-dbt run
-```
-
-*Note: The project uses tags to organize models by schema, allowing selective execution. For example, to run only models tagged with 'ddi' with debug logging:*
+### 6. Create the MinIO bucket (first time only)
 
 ```bash
-dbt run -s tag:ddi --log-level debug
+python setup_minio.py
 ```
 
-5. Test the output of the models:
-```bash
-dbt test
-```
+---
 
-6. Generate documentation for the project and persist to database:
+## Running the pipeline
+
+### Build all dbt models and run tests
+
 ```bash
 dbt build
 ```
-*Note: `dbt build` automatically includes `dbt docs generate` - it runs models, tests, generates docs, and persists documentation as database comments*
 
-7. View documentation for the project with exposures and lineage:
+Expected: `PASS=59 WARN=0 ERROR=0`
+
+### Register Iceberg tables in the REST catalog
+
+Run this after every `dbt build`:
+
 ```bash
-dbt docs serve
+python register_iceberg_tables.py
 ```
-*Note: The project includes exposures.yml defining dashboard dependencies for better lineage tracking*
 
-## Data Quality and Contract Validation
+This script:
+1. Scans MinIO for the latest `*.metadata.json` for each model
+2. Patches DuckDB metadata omissions (`last-sequence-number`, `sort-orders`) required by the REST catalog
+3. Calls the Iceberg REST catalog's `registerTable` endpoint via PyIceberg
 
-This project implements two layers of data quality enforcement:
-1. **dbt Contract Validation**: Validates that the physical database schema matches the defined dbt contract (columns and data types).
-2. **Soda Checks**: Validates data quality rules (nulls, uniqueness, ranges) using SodaCL, generated automatically from dbt tests.
+### Verify with Trino
 
-### dbt Contract Validation
+```bash
+trino --server localhost:8080 --catalog lakehouse
+```
 
-The project includes a custom macro `validate_contracts` that enforces schema contracts for models tagged with `serving`.
+```sql
+SELECT customer_id, first_name, customer_lifetime_value FROM marts.customers LIMIT 5;
+SELECT order_date, rolling_30_day_amount FROM ddi.rolling_30_day_orders LIMIT 5;
+SELECT customer_id, days_since_last_order FROM ddi.at_risk_customers LIMIT 5;
+```
 
-To run the validation:
+---
+
+## Selective model execution
+
+```bash
+# Run only DDI models
+dbt run -s tag:ddi --log-level debug
+
+# Run only marts
+dbt run -s marts.*
+```
+
+---
+
+## Data quality and contract validation
+
+### dbt native contract enforcement
+
+All marts and DDI models declare `contract: enforced: true`. dbt validates column names and types at build time — mismatches fail the build before any data is written.
+
+### Cross-schema contract validation macro
+
 ```bash
 dbt run-operation validate_contracts
 ```
 
-This macro checks:
-- **Missing columns**: Columns defined in the contract but missing in the database.
-- **Extra columns**: Columns present in the database but not in the contract.
-- **Type mismatches**: Discrepancies between defined data types and actual database types.
+Checks models tagged `serving` for missing columns, extra columns, and type mismatches against the contract spec. Use as a CI blocking step or pre-commit hook.
 
-If any violations are found, the operation raises a compiler error and fails the pipeline.
+### Soda checks
 
-**Best Practice**: Run this operation as a **pre-commit hook** or as a blocking step in your **CI/CD pipeline** (e.g., GitHub Actions, GitLab CI) to ensure that no code violating the data contract is merged or deployed.
+Generate SodaCL checks from dbt contract definitions:
 
-### Soda Checks Generation
-
-We use Soda Core to run data quality checks. To ensure consistency between dbt tests and Soda checks, we provide a script to generate SodaCL configuration from dbt model definitions.
-
-To generate Soda checks:
 ```bash
 python3 generate_soda_from_dbt_contract.py
 ```
 
-This script:
-1. Reads the dbt schema definition (e.g., `models/ddi/schema.yml`)
-2. Translates dbt tests into SodaCL checks:
-   - `not_null` -> `missing_count = 0`
-   - `unique` -> `duplicate_count = 0`
-   - `accepted_values` -> `invalid_percent = 0`
-   - `dbt_expectations` -> `min/max` checks
-3. Outputs YAML files (e.g., `soda_checks_rolling_30_day_orders.yml`)
+Run the generated checks:
 
-To run the generated Soda checks (requires Soda Core installed and configured):
 ```bash
 soda scan -d jaffle_shop_datasource -c .soda/configuration.yml soda_checks_rolling_30_day_orders.yml
 ```
 
+---
 
-## Apache Superset
+## Trino
 
-Apache Superset is included in the docker-compose setup for data visualization and exploration.
-
-### Accessing Superset
-
-1. After running `podman compose up -d` or `docker-compose up -d`, Superset will be available at [http://localhost:8088](http://localhost:8088)
-
-2. Default login credentials:
-   - Username: `admin`
-   - Password: `admin`
-
-### Database Connection
-
-The dbt database is automatically added as a data source during Superset initialization. You can immediately start creating charts and dashboards using the dbt-transformed data in the following schemas:
-
-- **Main models**: `jaffle-shop-classic` schema (staging and marts models)
-- **Analytics models**: `ddi` schema (rolling 30-day orders analysis)
-
-If you need to manually add or modify database connections:
-1. Log in to Superset with the admin credentials
-2. Go to **Data** > **Databases** in the top menu
-3. Click **+ Database**
-4. Select **PostgreSQL** as the database type
-5. Enter the following connection details:
-   - **Host**: `postgres`
-   - **Port**: `5432`
-   - **Database Name**: `dbt`
-   - **Username**: `dbt`
-   - **Password**: `dbt`
-6. Click **Test Connection** to verify
-7. Click **Add** to save the database
-
-## Data-Driven Insights (DDI) Schema
-
-The project includes a dedicated `ddi` schema for advanced analytics and insights models.
-
-### Rolling 30-Day Orders Analysis
-
-The `rolling_30_day_orders` model provides time-series analysis of completed orders with the following features:
-
-- **Daily aggregations**: Total amount and order count per day
-- **Rolling metrics**: 30-day rolling sums and averages
-- **Trend analysis**: Last 50 data points for recent trend visualization
-- **ANSI SQL compliance**: Portable across PostgreSQL, Snowflake, BigQuery, Redshift, etc.
-
-#### Model Structure
-- **order_date**: Date of orders (DATE)
-- **total_amount**: Daily total payment amount (NUMERIC)
-- **order_count**: Daily number of completed orders (INTEGER)
-- **rolling_30_day_amount**: 30-day rolling sum of amounts (NUMERIC)
-- **rolling_30_day_orders**: 30-day rolling sum of order counts (NUMERIC)
-- **rolling_30_day_avg_daily**: 30-day rolling average daily amount (NUMERIC)
-
-#### Data Contracts
-The model enforces strict data quality contracts including:
-- Not null constraints on all columns
-- Value range validations
-- Uniqueness constraints on dates
-- Relationship validations
-
-#### Usage in Superset
-1. Navigate to **Data** > **Datasets**
-2. Select the `dbt` database
-3. Choose the `dbt_ddi.rolling_30_day_orders` table (note: `dbt_` prefix + `ddi` schema)
-4. Create charts using the rolling metrics for trend analysis
-5. Use time-series charts to visualize order patterns over the 30-day windows
-
-**Note**: Tables are organized by schema:
-- Main models (customers, orders, staging): `dbt.jaffle-shop-classic.{table_name}`
-- Analytics models (rolling metrics): `dbt.ddi.{table_name}`
-
-## Trino Cluster
-
-The setup includes a Trino cluster that registers the Postgres database in the catalog named `jaffle_postgres`. Trino provides a federated query engine allowing SQL queries across multiple data sources.
-
-### Accessing Trino
-
-After running `podman compose up -d` or `docker-compose up -d`, Trino will be available at [http://localhost:8080](http://localhost:8080)
+Trino is available at [http://localhost:8080](http://localhost:8080) and exposes the Iceberg catalog as `lakehouse`.
 
 ### Connecting with DBeaver
 
-#### Connecting to Trino
+1. Create a new connection, select **Trino**
+2. Host: `localhost`, Port: `8080`, Catalog: `lakehouse`
+3. No username/password required
+4. Query tables as `lakehouse.marts.customers`, `lakehouse.ddi.rolling_30_day_orders`, etc.
 
-1. In DBeaver, create a new connection
-2. Select **Trino** as the database type
-3. Enter the following connection details:
-   - **Host**: `localhost`
-   - **Port**: `8080`
-   - **Database/Schema**: `jaffle_postgres`
-4. No username or password is required (default configuration)
-5. Click **Test Connection** to verify
-6. Click **Finish** to save the connection
+---
 
-#### Connecting to Postgres Directly
+## Apache Superset
 
-1. In DBeaver, create a new connection
-2. Select **PostgreSQL** as the database type
-3. Enter the following connection details:
-   - **Host**: `localhost`
-   - **Port**: `5432`
-   - **Database**: `dbt`
-   - **Username**: `dbt`
-   - **Password**: `dbt`
-4. Click **Test Connection** to verify
-5. Click **Finish** to save the connection
+Superset is available at [http://localhost:8088](http://localhost:8088) (admin / admin).
 
-Note: The Trino user (`trino_user`) has limited access to `dbt_ddi` and `dbt_marts` schemas only, while the direct Postgres connection uses the `dbt` user with full access.
+Connect Superset to the data by adding a **Trino** database connection:
+
+- **SQLAlchemy URI**: `trino://trino_user@trino:8080/lakehouse`
+
+Then create datasets from `marts.customers`, `marts.orders`, `ddi.rolling_30_day_orders`, and `ddi.at_risk_customers`.
+
+---
+
+## DDI models
+
+### `rolling_30_day_orders`
+
+Time-series analysis of completed orders:
+
+| Column | Type | Description |
+|---|---|---|
+| `order_date` | DATE | Order date |
+| `total_amount` | DECIMAL(38,8) | Daily total payment amount |
+| `order_count` | DECIMAL(38,8) | Daily completed order count |
+| `rolling_30_day_amount` | DECIMAL(38,8) | 30-day rolling sum of amounts |
+| `rolling_30_day_orders` | DECIMAL(38,8) | 30-day rolling order count |
+| `rolling_30_day_avg_daily` | DECIMAL(38,8) | 30-day rolling average daily amount |
+
+### `at_risk_customers`
+
+Customers with no orders in the last 60 days (based on the most recent order date in the dataset):
+
+| Column | Type | Description |
+|---|---|---|
+| `customer_id` | INTEGER | Customer identifier |
+| `first_name` | VARCHAR | First name |
+| `last_name` | VARCHAR | Last name |
+| `first_order_date` | DATE | Date of first order |
+| `last_order_date` | DATE | Date of most recent order |
+| `total_orders` | BIGINT | Total number of orders |
+| `completed_orders` | BIGINT | Number of completed orders |
+| `reference_date` | DATE | Dataset's most recent order date (used as "today") |
+| `days_since_last_order` | INTEGER | Days between last order and reference date |
+
+---
+
+## Known DuckDB + Iceberg integration notes
+
+- **Integer division**: `amount / 100` in DuckDB produces `DOUBLE`, not `INTEGER`. Downstream aggregations must be explicitly cast to match the contract type (`CAST(SUM(amount) AS BIGINT)`).
+- **Iceberg metadata patches**: DuckDB omits `last-sequence-number` from Iceberg v2 metadata and writes `sort-orders: []`. Both are invalid per the Iceberg spec and cause the REST catalog's `registerTable` to reject them. `register_iceberg_tables.py` patches both fields before registration.
+- **S3 paths**: dbt-duckdb writes external Iceberg tables to `<external_root>/<model_name>.iceberg/`. The schema segment is not included in the path by default.

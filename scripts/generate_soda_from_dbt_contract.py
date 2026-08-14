@@ -91,18 +91,17 @@ def main(contract_path="models/ddi/schema.yml", model_name="rolling_30_day_order
     print(f"Generated {output_path} with {len(checks)} checks for model {model_name}")
 
 if __name__ == "__main__":
-    # Generate for rolling_30_day_orders
+    # Table names are unqualified; catalog and schema are set in soda/configuration.yml
     main(
         contract_path="models/ddi/schema.yml",
         model_name="rolling_30_day_orders",
-        output_path="soda_checks_rolling_30_day_orders.yml",
-        table_name="dbt_ddi.rolling_30_day_orders"
+        output_path="soda/soda_checks_rolling_30_day_orders.yml",
+        table_name="rolling_30_day_orders"
     )
-    
-    # Generate for at_risk_customers
+
     main(
         contract_path="models/ddi/schema.yml",
         model_name="at_risk_customers",
-        output_path="soda_checks_at_risk_customers.yml",
-        table_name="dbt_ddi.at_risk_customers"
+        output_path="soda/soda_checks_at_risk_customers.yml",
+        table_name="at_risk_customers"
     )

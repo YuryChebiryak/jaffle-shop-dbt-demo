@@ -58,11 +58,13 @@
                     {% do missing_columns.append(col_name) %}
                 {% else %}
                     {% set runtime_type = runtime_col_dict[col_name] %}
-                    
-                    {# Normalize runtime type #}
-                    {% set runtime_type_norm = type_mapping.get(runtime_type, runtime_type) %}
-                    
-                    {# Normalize contract type: strip parameters and map synonyms #}
+
+                    {# Strip precision/scale parameters then map synonyms on both sides.
+                       dbt's native contract enforcement catches precision mismatches at
+                       build time; here we only verify the base type family matches. #}
+                    {% set runtime_type_base = runtime_type.split('(')[0] %}
+                    {% set runtime_type_norm = type_mapping.get(runtime_type_base, runtime_type_base) %}
+
                     {% set contract_type_base = contract_type.split('(')[0] %}
                     {% set contract_type_norm = type_mapping.get(contract_type_base, contract_type_base) %}
                     
